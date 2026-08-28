@@ -25,6 +25,7 @@ import androidx.compose.material.icons.automirrored.filled.ReplyAll
 import androidx.compose.material.icons.automirrored.filled.StarHalf
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Help
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.VolunteerActivism
 import androidx.compose.material3.AlertDialog
@@ -55,6 +56,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import app.gamenative.R
+import app.gamenative.data.PlatformAccount
 import app.gamenative.service.SteamService
 import app.gamenative.ui.screen.PluviaScreen
 import app.gamenative.ui.theme.PluviaTheme
@@ -74,6 +76,9 @@ fun ProfileDialog(
     onDismiss: () -> Unit,
     onGoOnline: () -> Unit,
     isOffline: Boolean = false,
+    otherSteamAccounts: List<PlatformAccount> = emptyList(),
+    onSwitchSteamAccount: (PlatformAccount) -> Unit = {},
+    onOpenSteamAccounts: () -> Unit = {},
 ) {
     if (!openDialog) {
         return
@@ -166,6 +171,52 @@ fun ProfileDialog(
                                     Icon(imageVector = Icons.AutoMirrored.Filled.StarHalf, contentDescription = null)
                                     Spacer(modifier = Modifier.size(ButtonDefaults.IconSize))
                                     Text(text = stringResource(R.string.hall_of_fame))
+                                }
+
+                                // Steam Accounts section
+                                if (otherSteamAccounts.isNotEmpty()) {
+                                    Spacer(modifier = Modifier.height(8.dp))
+                                    Text(
+                                        text = stringResource(R.string.switch_account),
+                                        style = MaterialTheme.typography.labelMedium,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        modifier = Modifier.padding(horizontal = 4.dp),
+                                    )
+                                    Spacer(modifier = Modifier.height(4.dp))
+                                    otherSteamAccounts.forEach { account ->
+                                        FilledTonalButton(
+                                            modifier = Modifier.fillMaxWidth(),
+                                            onClick = {
+                                                onSwitchSteamAccount(account)
+                                                onDismiss()
+                                            },
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Default.Person,
+                                                contentDescription = null,
+                                            )
+                                            Spacer(modifier = Modifier.size(ButtonDefaults.IconSize))
+                                            Text(
+                                                text = account.displayName,
+                                                maxLines = 1,
+                                            )
+                                        }
+                                    }
+                                    Spacer(modifier = Modifier.height(4.dp))
+                                    FilledTonalButton(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        onClick = {
+                                            onOpenSteamAccounts()
+                                            onDismiss()
+                                        },
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.Settings,
+                                            contentDescription = null,
+                                        )
+                                        Spacer(modifier = Modifier.size(ButtonDefaults.IconSize))
+                                        Text(text = stringResource(R.string.accounts_steam))
+                                    }
                                 }
 
                                 if(isOffline) {

@@ -9,9 +9,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.navigation.NavController
+import app.gamenative.account.AccountManager
 import app.gamenative.db.dao.AmazonGameDao
 import app.gamenative.db.dao.GOGGameDao
 import app.gamenative.events.EventDispatcher
+import app.gamenative.events.SteamEvent
 import app.gamenative.powercontrol.PowerManager
 import app.gamenative.service.ActiveGameRegistry
 import app.gamenative.service.DownloadService
@@ -47,6 +49,7 @@ class PluviaApp : SplitCompatApplication() {
 
     @Inject lateinit var gogGameDao: GOGGameDao
     @Inject lateinit var amazonGameDao: AmazonGameDao
+    @Inject lateinit var accountManager: AccountManager
 
     private val appScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
@@ -78,6 +81,46 @@ class PluviaApp : SplitCompatApplication() {
         // Init our datastore preferences.
         PrefManager.init(this)
         FrontendSyncManager.init(this)
+
+        // Migrate existing single-account credentials to multi-account system
+        appScope.launch {
+            accountManager.migrateExistingCredentials(applicationContext)
+        }
+
+        // Register Steam account on successful login
+        events.on<SteamEvent.LogonEnded, Unit> { event ->
+            if (event.loginResult == app.gamenative.enums.LoginResult.Success) {
+                appScope.launch {
+                    try {
+                        val steamId64 = PrefManager.steamUserSteamId64
+                        val accountId = if (steamId64 != 0L) steamId64.toString() else PrefManager.username
+                        if (accountId.isNotEmpty()) {
+                            accountManager.saveCurrentSteamCredentials(applicationContext, accountId)
+                            val json = org.json.JSONObject().apply {
+                                put("username", PrefManager.username)
+                                put("access_token", PrefManager.accessToken)
+                                put("refresh_token", PrefManager.refreshToken)
+                                put("steam_user_name", PrefManager.steamUserName)
+                                put("steam_user_avatar_hash", PrefManager.steamUserAvatarHash)
+                                put("steam_user_account_id", PrefManager.steamUserAccountId)
+                                put("steam_user_steam_id_64", steamId64)
+                                put("client_id", PrefManager.clientId ?: 0L)
+                            }
+                            accountManager.addAccount(
+                                context = applicationContext,
+                                platform = "STEAM",
+                                accountId = accountId,
+                                displayName = PrefManager.steamUserName.ifEmpty { PrefManager.username },
+                                avatarUrl = PrefManager.steamUserAvatarHash,
+                                credentialsJson = json,
+                            )
+                        }
+                    } catch (e: Exception) {
+                        Timber.e(e, "[PluviaApp] Failed to register Steam account")
+                    }
+                }
+            }
+        }
 
         // Initialize GOGConstants
         app.gamenative.service.gog.GOGConstants.init(this)
@@ -184,6 +227,11 @@ class PluviaApp : SplitCompatApplication() {
 
         private lateinit var instance: PluviaApp
         private var cachedDefaultScreenSize: String? = null
+
+        /**
+         * Access the application instance. Used for accessing injected dependencies like AccountManager.
+         */
+        internal fun getInstance(): PluviaApp = instance
 
         // TODO: find a way to make this saveable, this is terrible (leak that memory baby)
         internal var xEnvironment: XEnvironment? = null

@@ -18,15 +18,16 @@
 ## 🚀 Key Improvements in HyperNative
 
 * 🛡️ **Zero Telemetry & Tracking**: All third-party analytics (PostHog, background usage tracking, and diagnostic telemetry) have been completely removed. Your gameplay, account details, and session data stay strictly local.
-* 🤖 **AI-Assisted Maintenance**: Code refactoring, bug fixes, and feature implementations driven and refined with modern AI workflows.
+* 👥 **Universal Multi-Account Support**: Connect and manage multiple accounts for Steam, Epic Games, GOG, and Amazon Games. Includes seamless switching, default account star-toggling, and per-game launch account overrides.
+* 🤖 **AI-Assisted Maintenance**: Code refactoring, bug fixes, and feature implementations driven and refined with modern AI workflows. (Gemini Flash 3.7 Extended and Mimo v2.5 Pro)
 
 ---
 
 ## 🗺️ Roadmap
 
 - [x] Complete telemetry and tracker removal
-- [ ] Multi-account management with default star toggle (Steam, Epic, GOG, Amazon)
-- [ ] Per-game launch account selector
+- [x] Multi-account management with default star toggle (Steam, Epic, GOG, Amazon)
+- [x] Per-game launch account selector
 - [ ] Streamlined and modernized UI
 - [ ] One-click update button for game compatibility configurations
 

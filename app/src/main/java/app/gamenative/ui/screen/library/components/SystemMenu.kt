@@ -257,6 +257,10 @@ fun SystemMenu(
     onEpicLogoutClick: () -> Unit,
     onAmazonLoginClick: () -> Unit,
     onAmazonLogoutClick: () -> Unit,
+    onSteamAccountsClick: () -> Unit = {},
+    onGogAccountsClick: () -> Unit = {},
+    onEpicAccountsClick: () -> Unit = {},
+    onAmazonAccountsClick: () -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     val scope = rememberCoroutineScope()
@@ -636,13 +640,12 @@ fun SystemMenu(
                             )
 
                             SystemMenuItem(
-                                text = stringResource(R.string.steam_sign_out),
-                                icon = Icons.AutoMirrored.Filled.Logout,
+                                text = stringResource(R.string.accounts_steam),
+                                icon = Icons.Default.Person,
                                 onClick = {
-                                    onLogout()
+                                    onSteamAccountsClick()
                                     onDismiss()
                                 },
-                                isDestructive = true,
                             )
                         }
 
@@ -657,55 +660,52 @@ fun SystemMenu(
                         // GOG
                         SystemMenuItem(
                             text = stringResource(
-                                if (gogLoggedIn) R.string.gog_settings_logout_title
+                                if (gogLoggedIn) R.string.accounts_gog
                                 else R.string.gog_settings_login_title,
                             ),
                             icon = if (gogLoggedIn) {
-                                Icons.AutoMirrored.Filled.Logout
+                                Icons.Default.Person
                             } else {
                                 Icons.AutoMirrored.Filled.Login
                             },
                             onClick = {
-                                if (gogLoggedIn) onGogLogoutClick() else onGogLoginClick()
+                                if (gogLoggedIn) onGogAccountsClick() else onGogLoginClick()
                                 onDismiss()
                             },
-                            isDestructive = gogLoggedIn,
                         )
 
                         // Epic
                         SystemMenuItem(
                             text = stringResource(
-                                if (epicLoggedIn) R.string.epic_settings_logout_title
+                                if (epicLoggedIn) R.string.accounts_epic
                                 else R.string.epic_settings_login_title,
                             ),
                             icon = if (epicLoggedIn) {
-                                Icons.AutoMirrored.Filled.Logout
+                                Icons.Default.Person
                             } else {
                                 Icons.AutoMirrored.Filled.Login
                             },
                             onClick = {
-                                if (epicLoggedIn) onEpicLogoutClick() else onEpicLoginClick()
+                                if (epicLoggedIn) onEpicAccountsClick() else onEpicLoginClick()
                                 onDismiss()
                             },
-                            isDestructive = epicLoggedIn,
                         )
 
                         // Amazon
                         SystemMenuItem(
                             text = stringResource(
-                                if (amazonLoggedIn) R.string.amazon_settings_logout_title
+                                if (amazonLoggedIn) R.string.accounts_amazon
                                 else R.string.amazon_settings_login_title,
                             ),
                             icon = if (amazonLoggedIn) {
-                                Icons.AutoMirrored.Filled.Logout
+                                Icons.Default.Person
                             } else {
                                 Icons.AutoMirrored.Filled.Login
                             },
                             onClick = {
-                                if (amazonLoggedIn) onAmazonLogoutClick() else onAmazonLoginClick()
+                                if (amazonLoggedIn) onAmazonAccountsClick() else onAmazonLoginClick()
                                 onDismiss()
                             },
-                            isDestructive = amazonLoggedIn,
                         )
                     }
 

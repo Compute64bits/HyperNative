@@ -2337,4 +2337,19 @@
     <string name="power_control_strategy_conservative">Conservative</string>
     <string name="power_control_strategy_conservative_desc">AdjustsGradual gradually with a focus on stability</string>
     <string name="xr_refresh_rate">VR Refresh Rate</string>
+
+    <!-- Multi-Account System -->
+    <string name="accounts_steam">Steam Accounts</string>
+    <string name="accounts_gog">GOG Accounts</string>
+    <string name="accounts_epic">Epic Accounts</string>
+    <string name="accounts_amazon">Amazon Games Accounts</string>
+    <string name="add_account">Add Account</string>
+    <string name="remove_account">Remove Account</string>
+    <string name="remove_account_confirmation">Remove \"%s\" from your accounts?</string>
+    <string name="set_as_primary">Set as Primary</string>
+    <string name="primary_account">Primary</string>
+    <string name="switch_account">Switch Account</string>
+    <string name="no_accounts_connected">No accounts connected</string>
+    <string name="launch_with_account">Launch with: %s</string>
+    <string name="select_account">Select Account</string>
 </resources>

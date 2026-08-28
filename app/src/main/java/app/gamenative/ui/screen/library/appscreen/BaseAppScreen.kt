@@ -27,6 +27,7 @@ import androidx.core.content.FileProvider
 import androidx.core.net.toUri
 import app.gamenative.PluviaApp
 import app.gamenative.R
+import app.gamenative.account.AccountManager
 import app.gamenative.api.isValidCommunityConfig
 import app.gamenative.api.prepareCommunityConfigForApply
 import app.gamenative.data.GameSource
@@ -1542,6 +1543,26 @@ abstract class BaseAppScreen {
         var showReadiness by remember { mutableStateOf(false) }
 
         // Render the common UI
+        val accountManager = PluviaApp.getInstance().accountManager
+        val platform = app.gamenative.account.AccountManager.platformFromGameSource(libraryItem.gameSource)
+        val allAccounts by if (platform.isNotEmpty()) {
+            accountManager.getAccountsFlow(platform).collectAsStateWithLifecycle(initialValue = emptyList())
+        } else {
+            remember { kotlinx.coroutines.flow.flowOf(emptyList<app.gamenative.data.PlatformAccount>()) }.collectAsStateWithLifecycle(initialValue = emptyList())
+        }
+        val gameAccountPref by if (platform.isNotEmpty()) {
+            accountManager.getGameAccountFlow(libraryItem.appId).collectAsStateWithLifecycle(initialValue = null)
+        } else {
+            remember { kotlinx.coroutines.flow.flowOf<app.gamenative.data.GameAccountPreference?>(null) }.collectAsStateWithLifecycle(initialValue = null)
+        }
+        val currentLaunchAccount = remember(allAccounts, gameAccountPref) {
+            if (gameAccountPref != null) {
+                allAccounts.find { it.accountId == gameAccountPref!!.accountId }
+            } else {
+                allAccounts.find { it.isPrimary }
+            }
+        }
+
         app.gamenative.ui.screen.library.AppScreenContent(
             displayInfo = displayInfo,
             isInstalled = isInstalledState,
@@ -1587,6 +1608,13 @@ abstract class BaseAppScreen {
             onBack = onBack,
             optionsMenu = optionsMenu,
             dialogOpen = showConfigDialog || communityConfigsRequested || manageModsRequested,
+            currentLaunchAccount = currentLaunchAccount,
+            availableAccounts = allAccounts,
+            onLaunchAccountSelected = { account ->
+                uiScope.launch {
+                    accountManager.setGameAccount(libraryItem.appId, account.accountId, platform)
+                }
+            },
         )
 
         if (showReadiness && launchActivity != null) {

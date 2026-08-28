@@ -53,6 +53,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.foundation.focusGroup
@@ -120,6 +121,7 @@ import app.gamenative.service.gog.GOGService
 import app.gamenative.utils.CustomGameScanner
 import app.gamenative.utils.PlatformOAuthHandlers
 import app.gamenative.utils.SteamUtils
+import app.gamenative.ui.component.dialog.AccountsDialog
 import kotlinx.coroutines.launch
 import android.os.SystemClock
 
@@ -1304,6 +1306,13 @@ private fun LibraryScreenContent(
             val epicLoggedIn = app.gamenative.service.epic.EpicAuthManager.hasStoredCredentials(context)
             val amazonLoggedIn = app.gamenative.service.amazon.AmazonAuthManager.hasStoredCredentials(context)
 
+            // Accounts dialog state
+            var showAccountsDialog by remember { mutableStateOf(false) }
+            var accountsDialogPlatform by remember { mutableStateOf("") }
+            val accountManager = PluviaApp.getInstance().accountManager
+            val allAccounts by accountManager.allAccounts.collectAsStateWithLifecycle()
+            val scope = rememberCoroutineScope()
+
             SystemMenu(
                 isOpen = isSystemMenuOpen,
                 onDismiss = { isSystemMenuOpen = false },
@@ -1345,7 +1354,55 @@ private fun LibraryScreenContent(
                         callbacks = PlatformLogoutCallbacks(),
                     )
                 },
+                onSteamAccountsClick = {
+                    accountsDialogPlatform = "STEAM"
+                    showAccountsDialog = true
+                },
+                onGogAccountsClick = {
+                    accountsDialogPlatform = "GOG"
+                    showAccountsDialog = true
+                },
+                onEpicAccountsClick = {
+                    accountsDialogPlatform = "EPIC"
+                    showAccountsDialog = true
+                },
+                onAmazonAccountsClick = {
+                    accountsDialogPlatform = "AMAZON"
+                    showAccountsDialog = true
+                },
             )
+
+            // Accounts Dialog
+            if (showAccountsDialog) {
+                val platformAccounts = allAccounts[accountsDialogPlatform] ?: emptyList()
+                AccountsDialog(
+                    openDialog = showAccountsDialog,
+                    platform = accountsDialogPlatform,
+                    accounts = platformAccounts,
+                    onDismiss = { showAccountsDialog = false },
+                    onAddAccount = {
+                        when (accountsDialogPlatform) {
+                            "GOG" -> gogOAuthLauncher.launch(Intent(context, GOGOAuthActivity::class.java))
+                            "EPIC" -> epicOAuthLauncher.launch(Intent(context, EpicOAuthActivity::class.java))
+                            "AMAZON" -> amazonOAuthLauncher.launch(Intent(context, AmazonOAuthActivity::class.java))
+                            "STEAM" -> {
+                                onLogout()
+                                // User will need to log in again with different account
+                            }
+                        }
+                    },
+                    onRemoveAccount = { account ->
+                        scope.launch {
+                            accountManager.removeAccount(context, account.platform, account.accountId)
+                        }
+                    },
+                    onSetPrimary = { account ->
+                        scope.launch {
+                            accountManager.setPrimaryAccount(context, account.platform, account.accountId)
+                        }
+                    },
+                )
+            }
         }
 
         // Pre-import dialog (modern add path)

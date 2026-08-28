@@ -18,7 +18,7 @@ object EpicAuthManager {
     // server-side validity window to avoid burning the quota on relaunches.
     private const val OWNERSHIP_TOKEN_CACHE_TTL_MS = 25L * 60L * 1000L
 
-    private fun getCredentialsFilePath(context: Context): String {
+    internal fun getCredentialsFilePath(context: Context): String {
         val dir = File(context.filesDir, "epic")
         if (!dir.exists()) {
             dir.mkdirs()

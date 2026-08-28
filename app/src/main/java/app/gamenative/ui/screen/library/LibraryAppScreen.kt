@@ -115,6 +115,7 @@ import app.gamenative.service.SteamService
 import app.gamenative.ui.component.GamepadAction
 import app.gamenative.ui.component.GamepadActionBar
 import app.gamenative.ui.component.GamepadButton
+import app.gamenative.ui.component.AccountSelector
 import app.gamenative.ui.component.focusRing
 import app.gamenative.ui.component.LoadingScreen
 import app.gamenative.ui.data.AppMenuOption
@@ -580,6 +581,9 @@ internal fun AppScreenContent(
     optionsMenu: List<AppMenuOption>,
     dialogOpen: Boolean = false,
     immersiveMode: ImmersiveModeUiState = ImmersiveModeUiState(),
+    currentLaunchAccount: app.gamenative.data.PlatformAccount? = null,
+    availableAccounts: List<app.gamenative.data.PlatformAccount> = emptyList(),
+    onLaunchAccountSelected: (app.gamenative.data.PlatformAccount) -> Unit = {},
 ) {
     val context = LocalContext.current
     // reactive — recomposes when network state changes
@@ -895,6 +899,17 @@ internal fun AppScreenContent(
                     )
 
                     Spacer(modifier = Modifier.height(16.dp))
+
+                    // Account selector (if multiple accounts available)
+                    if (availableAccounts.size > 1) {
+                        AccountSelector(
+                            currentAccount = currentLaunchAccount,
+                            allAccounts = availableAccounts,
+                            onAccountSelected = onLaunchAccountSelected,
+                            modifier = Modifier.align(Alignment.End),
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                    }
 
                     // Integrated action bar - overlaid on hero
                     val isPortrait = LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT

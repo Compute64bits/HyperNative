@@ -14,7 +14,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import app.gamenative.PluviaApp
+import app.gamenative.PrefManager
+import app.gamenative.data.PlatformAccount
 import app.gamenative.data.SteamFriend
 import app.gamenative.events.SteamEvent
 import app.gamenative.service.SteamService
@@ -32,9 +35,12 @@ fun AccountButton(
     onLogout: () -> Unit,
     onGoOnline: () -> Unit,
     isOffline: Boolean = false,
+    onOpenSteamAccounts: () -> Unit = {},
 ) {
     val scope = rememberCoroutineScope()
     var persona by remember { mutableStateOf<SteamFriend?>(null) }
+    val accountManager = PluviaApp.getInstance().accountManager
+    val allAccounts by accountManager.allAccounts.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
         persona = SteamService.instance?.localPersona?.value
@@ -51,6 +57,12 @@ fun AccountButton(
         onDispose {
             PluviaApp.events.off<SteamEvent.PersonaStateReceived, Unit>(onPersonaStateReceived)
         }
+    }
+
+    // Get other Steam accounts (excluding the current one)
+    val currentSteamId = PrefManager.steamUserSteamId64.toString()
+    val otherSteamAccounts = (allAccounts["STEAM"] ?: emptyList()).filter {
+        it.accountId != currentSteamId
     }
 
     var showDialog by remember { mutableStateOf(false) }
@@ -80,6 +92,19 @@ fun AccountButton(
             showDialog = false
         },
         isOffline = isOffline,
+        otherSteamAccounts = otherSteamAccounts,
+        onSwitchSteamAccount = { account ->
+            scope.launch {
+                accountManager.setPrimaryAccount(
+                    context = PluviaApp.getInstance(),
+                    platform = "STEAM",
+                    accountId = account.accountId,
+                )
+                // Trigger re-login with the new account
+                onLogout()
+            }
+        },
+        onOpenSteamAccounts = onOpenSteamAccounts,
     )
 
     IconButton(

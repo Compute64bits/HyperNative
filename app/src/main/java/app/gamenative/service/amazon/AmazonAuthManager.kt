@@ -18,7 +18,7 @@ object AmazonAuthManager {
 
     // ── Paths ───────────────────────────────────────────────────────────────
 
-    private fun getCredentialsFilePath(context: Context): String {
+    internal fun getCredentialsFilePath(context: Context): String {
         val dir = File(context.filesDir, "amazon")
         if (!dir.exists()) dir.mkdirs()
         return File(dir, "credentials.json").absolutePath
