@@ -23,6 +23,14 @@
 
 ---
 
+## 📥 Download
+
+Grab the latest pre-built APK from GitHub Releases :
+
+* 📦 **[Download Latest Release (APK)](https://github.com/Compute64bits/HyperNative/releases/latest)**
+
+---
+
 ## 🗺️ Roadmap
 
 - [x] Complete telemetry and tracker removal
