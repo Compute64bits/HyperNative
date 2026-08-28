@@ -990,20 +990,6 @@ object PrefManager {
             setPref(HAS_ATTEMPTED_GAME_LAUNCH, value)
         }
 
-    private val LAST_LAUNCH_PITCH_TIME = longPreferencesKey("last_launch_pitch_time")
-    var lastLaunchPitchTime: Long
-        get() = getPref(LAST_LAUNCH_PITCH_TIME, 0L)
-        set(value) {
-            setPref(LAST_LAUNCH_PITCH_TIME, value)
-        }
-
-    private val LAST_WARM_PITCH_TIME = longPreferencesKey("last_warm_pitch_time")
-    var lastWarmPitchTime: Long
-        get() = getPref(LAST_WARM_PITCH_TIME, 0L)
-        set(value) {
-            setPref(LAST_WARM_PITCH_TIME, value)
-        }
-
     private val APP_THEME = intPreferencesKey("app_theme")
     var appTheme: AppTheme
         get() {
