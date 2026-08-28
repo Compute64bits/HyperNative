@@ -76,7 +76,7 @@
 
 * **Release build (Low-RAM configuration):**
    ```bash
-    ./gradlew :app:assembleModernRelease --no-daemon --max-workers=1 -Dorg.gradle.jvmargs="-Xmx3072m" -x lint -x lintVitalAnalyzeModernRelease -x test
+  ./gradlew :app:assembleModernRelease --no-daemon --max-workers=1 -Dorg.gradle.jvmargs="-Xmx3072m" -x lint -x lintVitalAnalyzeModernRelease -x test
    ```
 APK binaries will be generated in `app/build/outputs/apk/modern/`.
 
