@@ -1106,6 +1106,7 @@ fun XServerScreen(
                     val isExternalDisplaySession =
                         (anchor.display?.displayId ?: Display.DEFAULT_DISPLAY) != Display.DEFAULT_DISPLAY
 
+                    @Suppress("DEPRECATION")
                     if (isExternalDisplaySession) {
                         imeInputReceiver?.showKeyboard() ?: imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0)
                     } else {
@@ -1931,6 +1932,7 @@ fun XServerScreen(
                         if (anchor.windowToken == null) return@post
                         val isExternalDisplaySession =
                             (anchor.display?.displayId ?: android.view.Display.DEFAULT_DISPLAY) != android.view.Display.DEFAULT_DISPLAY
+                        @Suppress("DEPRECATION")
                         if (isExternalDisplaySession) {
                             imeInputReceiver?.showKeyboard()
                                 ?: imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0)
@@ -3652,7 +3654,7 @@ private fun setupXEnvironment(
     diagnostics: Boolean,
     xServerState: MutableState<XServerState>,
     envVars: EnvVars,
-    container: Container?,
+    container: Container,
     appLaunchInfo: LaunchInfo?,
     xServer: XServer,
     containerVariantChanged: Boolean,
@@ -3662,7 +3664,7 @@ private fun setupXEnvironment(
     ProcessHelper.hardKillStaleWineProcesses()
 
     val gameSource = ContainerUtils.extractGameSourceFromContainerId(appId)
-    val lc_all = container!!.lC_ALL
+    val lc_all = container.lC_ALL
     val imageFs = ImageFs.find(context)
     Timber.i("ImageFs paths:")
     Timber.i("- rootDir: ${imageFs.getRootDir().absolutePath}")
@@ -3758,13 +3760,12 @@ private fun setupXEnvironment(
     var preInstallCommands: List<PreInstallSteps.PreInstallCommand> = emptyList()
     var gameExecutable = ""
 
-    if (container != null) {
-        try {
-            GameFixesRegistry.applyFor(context, appId, container)
-        } catch (e: Exception) {
-            Timber.tag("GameFixes").w(e, "Game fixes failed before launch")
-        }
-        if (container.startupSelection == Container.STARTUP_SELECTION_AGGRESSIVE) {
+    try {
+        GameFixesRegistry.applyFor(context, appId, container)
+    } catch (e: Exception) {
+        Timber.tag("GameFixes").w(e, "Game fixes failed before launch")
+    }
+    if (container.startupSelection == Container.STARTUP_SELECTION_AGGRESSIVE) {
             if (container.containerVariant.equals(Container.BIONIC)){
                 Timber.d("Incorrect startup selection detected. Reverting to essential startup selection")
                 container.startupSelection = Container.STARTUP_SELECTION_ESSENTIAL
@@ -3866,7 +3867,6 @@ private fun setupXEnvironment(
                 if (parts.size == 2) {
                     envVars.put(parts[0], parts[1])
                 }
-            }
         }
     }
 
@@ -3973,45 +3973,41 @@ private fun setupXEnvironment(
     FEXCoreManager.ensureAppConfigOverrides(context)
 
     // Moved here, as guestProgramLauncherComponent.environment is setup after addComponent()
-    if (container != null) {
-        if (container.isLaunchRealSteam) {
-            SteamTokenLogin(
-                steamId = PrefManager.steamUserSteamId64.toString(),
-                login = PrefManager.username,
-                token = PrefManager.refreshToken,
-                imageFs = imageFs,
-                guestProgramLauncherComponent = guestProgramLauncherComponent,
-            ).setupSteamFiles()
-        }
+    if (container.isLaunchRealSteam) {
+        SteamTokenLogin(
+            steamId = PrefManager.steamUserSteamId64.toString(),
+            login = PrefManager.username,
+            token = PrefManager.refreshToken,
+            imageFs = imageFs,
+            guestProgramLauncherComponent = guestProgramLauncherComponent,
+        ).setupSteamFiles()
     }
 
     // Log container settings before starting
-    if (container != null) {
-        Timber.i("---- Launching Container ----")
-        Timber.i("ID: ${container.id}")
-        Timber.i("Name: ${container.name}")
-        Timber.i("Screen Size: ${container.screenSize}")
-        Timber.i("Graphics Driver: ${container.graphicsDriver}")
-        Timber.i("DX Wrapper: ${container.dxWrapper} (Config: '${container.dxWrapperConfig}')")
-        Timber.i("Audio Driver: ${container.audioDriver}")
-        Timber.i("WoW64 Mode: ${container.isWoW64Mode}")
-        Timber.i("Box64 Version: ${container.box64Version}")
-        Timber.i("Box64 Preset: ${container.box64Preset}")
-        Timber.i("Box86 Version: ${container.box86Version}")
-        Timber.i("Box86 Preset: ${container.box86Preset}")
-        Timber.i("FEXCore Preset: ${container.fexCorePreset}")
-        Timber.i("CPU List: ${container.cpuList}")
-        Timber.i("CPU List WoW64: ${container.cpuListWoW64}")
-        Timber.i("Env Vars (Container Base): ${container.envVars}") // Log base container vars
-        Timber.i("Env Vars (Final Guest): ${envVars.toString()}")   // Log the actual env vars being passed
-        Timber.i("Guest Executable: ${guestProgramLauncherComponent.guestExecutable}") // Log the command
-        Timber.i("---------------------------")
-    }
+    Timber.i("---- Launching Container ----")
+    Timber.i("ID: ${container.id}")
+    Timber.i("Name: ${container.name}")
+    Timber.i("Screen Size: ${container.screenSize}")
+    Timber.i("Graphics Driver: ${container.graphicsDriver}")
+    Timber.i("DX Wrapper: ${container.dxWrapper} (Config: '${container.dxWrapperConfig}')")
+    Timber.i("Audio Driver: ${container.audioDriver}")
+    Timber.i("WoW64 Mode: ${container.isWoW64Mode}")
+    Timber.i("Box64 Version: ${container.box64Version}")
+    Timber.i("Box64 Preset: ${container.box64Preset}")
+    Timber.i("Box86 Version: ${container.box86Version}")
+    Timber.i("Box86 Preset: ${container.box86Preset}")
+    Timber.i("FEXCore Preset: ${container.fexCorePreset}")
+    Timber.i("CPU List: ${container.cpuList}")
+    Timber.i("CPU List WoW64: ${container.cpuListWoW64}")
+    Timber.i("Env Vars (Container Base): ${container.envVars}") // Log base container vars
+    Timber.i("Env Vars (Final Guest): ${envVars.toString()}")   // Log the actual env vars being passed
+    Timber.i("Guest Executable: ${guestProgramLauncherComponent.guestExecutable}") // Log the command
+    Timber.i("---------------------------")
 
     // Request encrypted app ticket for Steam games at launch time
     val isCustomGame = gameSource == GameSource.CUSTOM_GAME
     val gameIdForTicket = ContainerUtils.extractGameIdFromContainerId(appId)
-    if (!bootToContainer && !isCustomGame && gameIdForTicket != null && !container.isLaunchRealSteam && !container.isLaunchBionicSteam) {
+    if (!bootToContainer && !isCustomGame && !container.isLaunchRealSteam && !container.isLaunchBionicSteam) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 val ticket = SteamService.instance?.getEncryptedAppTicket(gameIdForTicket)
@@ -4053,10 +4049,10 @@ private fun setupXEnvironment(
     if (gameSource == GameSource.STEAM) {
         Timber.tag("achievements").d("Setting up achievements for Steam appID=$appId...")
         val gameIdInt = ContainerUtils.extractGameIdFromContainerId(appId)
-        val configDirectory = gameIdInt?.let { SteamService.findSteamSettingsDir(context, it) }
+        val configDirectory = SteamService.findSteamSettingsDir(context, gameIdInt)
         var cachedAchAppId = SteamService.cachedAchievementsAppId
 
-        if (gameIdInt != null && configDirectory != null) {
+        if (configDirectory != null) {
             // Re-generate achievements (it should keep the already existing ones if they're there).
             if (cachedAchAppId != gameIdInt && SteamService.isLoggedIn) {
                 try {

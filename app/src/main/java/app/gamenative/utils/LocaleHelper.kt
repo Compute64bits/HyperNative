@@ -70,12 +70,12 @@ object LocaleHelper {
             languageCode.contains("-") -> {
                 val parts = languageCode.split("-")
                 if (parts.size == 2) {
-                    Locale(parts[0], parts[1])
+                    Locale.of(parts[0], parts[1])
                 } else {
-                    Locale(parts[0])
+                    Locale.of(parts[0])
                 }
             }
-            else -> Locale(languageCode)
+            else -> Locale.of(languageCode)
         }
     }
 

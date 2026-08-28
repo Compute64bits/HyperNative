@@ -23,6 +23,7 @@ class StatsAchievementsGenerator {
         return sb.toString()
     }
 
+    @Suppress("UNCHECKED_CAST")
     fun generateStatsAchievements(schema: ByteArray, userStats: UserStatsCallback, configDirectory: String): ProcessingResult {
         val parsedSchema = vdfParser.binaryLoads(schema)
         val achievementsOut = mutableListOf<Achievement>()

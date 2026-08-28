@@ -98,6 +98,7 @@ fun AuthWebViewDialog(
                                 )
 
                                 // OAuth WebView settings (secure defaults for GOG/Epic etc.)
+                                @Suppress("DEPRECATION")
                                 settings.apply {
                                     javaScriptEnabled = true
                                     domStorageEnabled = true
@@ -129,6 +130,7 @@ fun AuthWebViewDialog(
                                         return super.shouldOverrideUrlLoading(view, request)
                                     }
 
+                                    @Suppress("DEPRECATION")
                                     override fun shouldOverrideUrlLoading(view: WebView?, url: String?): Boolean {
                                         handleUrl(url)
                                         return super.shouldOverrideUrlLoading(view, url)
@@ -142,6 +144,7 @@ fun AuthWebViewDialog(
                                         }
                                     }
 
+                                    @Suppress("DEPRECATION")
                                     override fun onReceivedError(
                                         view: WebView?,
                                         errorCode: Int,

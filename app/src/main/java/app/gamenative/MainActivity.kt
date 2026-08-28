@@ -19,6 +19,7 @@ import androidx.activity.SystemBarStyle
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.core.view.WindowCompat
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -645,7 +646,7 @@ class MainActivity : ComponentActivity() {
     private fun applyImmersiveMode() {
         if (desiredSystemUiVisible) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                window.setDecorFitsSystemWindows(true)
+                WindowCompat.setDecorFitsSystemWindows(window, true)
                 window.insetsController?.show(
                     android.view.WindowInsets.Type.statusBars() or
                         android.view.WindowInsets.Type.navigationBars(),
@@ -661,7 +662,7 @@ class MainActivity : ComponentActivity() {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             // Use WindowInsetsController for Android 11+
-            window.setDecorFitsSystemWindows(false) // TODO: look into the proper way of doing this
+            WindowCompat.setDecorFitsSystemWindows(window, false)
             window.insetsController?.let { controller ->
                 controller.hide(
                     android.view.WindowInsets.Type.statusBars() or

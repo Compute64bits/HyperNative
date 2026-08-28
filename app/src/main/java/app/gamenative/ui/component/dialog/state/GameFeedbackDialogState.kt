@@ -36,6 +36,7 @@ data class GameFeedbackDialogState(
                 )
             },
             restore = { savedMap ->
+                @Suppress("UNCHECKED_CAST")
                 GameFeedbackDialogState(
                     visible = savedMap["visible"] as Boolean,
                     appId = savedMap["appId"] as String,

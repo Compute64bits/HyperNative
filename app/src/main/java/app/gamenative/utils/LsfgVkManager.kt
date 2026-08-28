@@ -175,6 +175,7 @@ object LsfgVkManager {
                 Choreographer.getInstance().postFrameCallback { frameTimeNanos ->
                     if (vsyncClockHandler !== handler) return@postFrameCallback
                     val refreshRate = runCatching {
+                        @Suppress("DEPRECATION")
                         (context.getSystemService(Context.WINDOW_SERVICE) as? WindowManager)
                             ?.defaultDisplay?.refreshRate
                     }.getOrNull()?.takeIf { it > 1f } ?: 60f

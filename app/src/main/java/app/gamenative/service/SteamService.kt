@@ -933,7 +933,6 @@ class SteamService : Service(), IChallengeUrlChanged {
             val archOk = when (depot.osArch) {
                 OSArch.Arch64, OSArch.Unknown -> true
                 OSArch.Arch32 -> !prefer64Bit
-                else -> false
             }
             if (!archOk) return false
             // 4. DLC you actually own
@@ -2128,13 +2127,6 @@ class SteamService : Service(), IChallengeUrlChanged {
                                             }
 
                                             val downloadBody = downloadResponse.body
-                                            if (downloadBody == null) {
-                                                Timber.w(
-                                                    "Empty body for steam controller config " +
-                                                        publishedFileId,
-                                                )
-                                                return@use
-                                            }
 
                                             configFile.outputStream().use { output ->
                                                 downloadBody.byteStream().use { input ->
@@ -3412,6 +3404,7 @@ class SteamService : Service(), IChallengeUrlChanged {
             // Merge GSE stat files using schema from getUserStats for name->id mapping
             if (gseStatsDir.isDirectory) {
                 val statNameToId = mutableMapOf<String, Int>()
+                @Suppress("UNCHECKED_CAST")
                 try {
                     val parsedSchema = VdfParser().binaryLoads(userStats.schema.toByteArray())
                     for ((_, appData) in parsedSchema) {

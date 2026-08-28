@@ -19,13 +19,14 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import app.gamenative.ui.component.NoExtractOutlinedTextField
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -202,7 +203,7 @@ fun ContentsManagerDialog(open: Boolean, onDismiss: () -> Unit) {
                 }
 
                 pendingProfile?.let { profile ->
-                    Divider(modifier = Modifier.padding(vertical = 8.dp))
+                    HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
                     Text(text = stringResource(R.string.selected_content), style = MaterialTheme.typography.titleMedium)
                     Column(
                         modifier = Modifier
@@ -238,7 +239,7 @@ fun ContentsManagerDialog(open: Boolean, onDismiss: () -> Unit) {
                     }
                 }
 
-                Divider(modifier = Modifier.padding(vertical = 12.dp))
+                HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp))
                 Text(text = stringResource(R.string.installed_contents), style = MaterialTheme.typography.titleMedium)
 
                 // Content type selector
@@ -254,7 +255,7 @@ fun ContentsManagerDialog(open: Boolean, onDismiss: () -> Unit) {
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = typeExpanded) },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .menuAnchor(),
+                            .menuAnchor(MenuAnchorType.PrimaryNotEditable),
                         placeholder = { Text(stringResource(R.string.select_type)) }
                     )
 
