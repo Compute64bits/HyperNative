@@ -93,7 +93,7 @@ object CustomGameScanner {
         }
 
     /**
-     * Roots whose immediate subfolders are treated as custom games: the public GameNative
+     * Roots whose immediate subfolders are treated as custom games: the public HyperNative
      * roots on every volume plus the app's own sandbox folders.
      */
     val scanRootPaths: List<String>

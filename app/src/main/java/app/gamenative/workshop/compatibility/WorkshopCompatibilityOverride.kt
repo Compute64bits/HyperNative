@@ -16,7 +16,7 @@ data class WorkshopCompatibilityOverride(
 
 enum class WorkshopExposureMode {
     /**
-     * Expose Workshop items through Steam metadata only. GameNative still
+     * Expose Workshop items through Steam metadata only. HyperNative still
      * writes mods.json, but skips filesystem Workshop links inside the game.
      */
     METADATA_ONLY,

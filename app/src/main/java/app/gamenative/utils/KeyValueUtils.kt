@@ -154,7 +154,7 @@ fun KeyValue.generateSteamApp(): SteamApp {
         ),
         ufsParseVersion = CURRENT_UFS_PARSE_VERSION,
         ufs = run {
-            // Parse rootoverrides: Steam allows per-OS root replacements. Since GameNative
+            // Parse rootoverrides: Steam allows per-OS root replacements. Since HyperNative
             // always runs Windows games via Wine, apply only the Windows overrides.
             data class RootOverride(
                 val fromRoot: PathType,

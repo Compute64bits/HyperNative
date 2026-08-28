@@ -46,7 +46,7 @@ object NexusDownloadLinkInbox {
     private val pendingWebsiteDownloads = linkedMapOf<FileKey, PendingNexusWebsiteDownload>()
 
     /**
-     * Returns callbacks routed to one GameNative library item. A callback is only
+     * Returns callbacks routed to one HyperNative library item. A callback is only
      * admitted after it matches the exact file for which that item opened Nexus.
      * This keeps another open game's dialog from consuming a one-use grant.
      */

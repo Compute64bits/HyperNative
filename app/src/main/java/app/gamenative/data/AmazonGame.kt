@@ -16,7 +16,7 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "amazon_games", indices = [Index("product_id")])
 data class AmazonGame(
     /**
-     * Auto-generated integer primary key for internal GameNative use.
+     * Auto-generated integer primary key for internal HyperNative use.
      * Used for events, intents, container IDs, etc.
      * For Amazon API calls, use [productId] instead.
      */

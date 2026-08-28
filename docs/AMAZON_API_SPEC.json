@@ -2,11 +2,11 @@
   "openapi": "3.0.3",
   "info": {
     "title": "Amazon Games API",
-    "description": "REST API specification for Amazon Games platform integration including device authentication, library entitlements, game downloads, and update checks. Based on GameNative implementation.",
+    "description": "REST API specification for Amazon Games platform integration including device authentication, library entitlements, game downloads, and update checks. Based on HyperNative implementation.",
     "version": "1.0.0",
     "contact": {
-      "name": "GameNative",
-      "url": "https://github.com/GameNative"
+      "name": "HyperNative",
+      "url": "https://github.com/HyperNative"
     }
   },
   "servers": [

@@ -295,7 +295,7 @@ fun WineProtonManagerDialog(open: Boolean, onDismiss: () -> Unit) {
             val binaryVariant = detectBinaryVariant(tmpDir)
 
             if (binaryVariant == "glibc") {
-                // Reject glibc builds - not supported in GameNative
+                // Reject glibc builds - not supported in HyperNative
                 statusMessage = ctx.getString(R.string.wine_proton_glibc_incompatible)
                 isStatusSuccess = false
 

@@ -65,7 +65,6 @@ import app.gamenative.workshop.WorkshopManager
 import app.gamenative.NetworkMonitor
 import app.gamenative.service.SteamService.Companion.getInstalledApp
 import com.google.android.play.core.splitcompat.SplitCompat
-import com.posthog.PostHog
 import com.winlator.container.Container
 import com.winlator.container.ContainerData
 import com.winlator.container.ContainerManager
@@ -489,12 +488,6 @@ class SteamAppScreen : BaseAppScreen() {
     ) {
         val gameId = libraryItem.gameId
         val appInfo = SteamService.getAppInfoOf(gameId)
-        if (PrefManager.usageAnalyticsEnabled) {
-            PostHog.capture(
-                event = "container_opened",
-                properties = mapOf("game_name" to (appInfo?.name ?: "")),
-            )
-        }
         super.onRunContainerClick(context, libraryItem, onClickPlay)
     }
 
@@ -805,12 +798,6 @@ class SteamAppScreen : BaseAppScreen() {
             AppMenuOption(
                 AppOptionMenuType.ForceCloudSync,
                 onClick = {
-                    if (PrefManager.usageAnalyticsEnabled) {
-                        PostHog.capture(
-                            event = "cloud_sync_forced",
-                            properties = mapOf("game_name" to appInfo.name),
-                        )
-                    }
                     CoroutineScope(Dispatchers.IO).launch {
                         SnackbarManager.show(context.getString(R.string.library_cloud_sync_starting))
 
@@ -961,7 +948,7 @@ class SteamAppScreen : BaseAppScreen() {
                 scope.launch {
                     showMoveDialog = true
                     StorageUtils.moveGamesFromOldPath(
-                        Paths.get(Environment.getExternalStorageDirectory().absolutePath, "GameNative", "Steam").pathString,
+                        Paths.get(Environment.getExternalStorageDirectory().absolutePath, "HyperNative", "Steam").pathString,
                         oldGamesDirectory,
                         onProgressUpdate = { currentFile, fileProgress, movedFiles, totalFiles ->
                             current = currentFile
@@ -1101,10 +1088,6 @@ class SteamAppScreen : BaseAppScreen() {
 
                 DialogType.INSTALL_APP -> {
                     {
-                        PostHog.capture(
-                            event = "game_install_started",
-                            properties = mapOf("game_name" to (appInfo?.name ?: "")),
-                        )
                         hideInstallDialog(gameId)
                         CoroutineScope(Dispatchers.IO).launch {
                             SteamService.downloadApp(gameId)
@@ -1120,10 +1103,6 @@ class SteamAppScreen : BaseAppScreen() {
 
                 DialogType.CANCEL_APP_DOWNLOAD -> {
                     {
-                        PostHog.capture(
-                            event = "game_install_cancelled",
-                            properties = mapOf("game_name" to (appInfo?.name ?: "")),
-                        )
                         val downloadInfo = SteamService.getAppDownloadInfo(gameId)
                         downloadInfo?.cancel()
                         SteamService.workshopPausedApps.remove(gameId)
@@ -1279,10 +1258,6 @@ class SteamAppScreen : BaseAppScreen() {
                                                     appInfo?.name ?: libraryItem.name,
                                                 ),
                                             )
-                                            PostHog.capture(
-                                                event = "game_uninstalled",
-                                                properties = mapOf("game_name" to (appInfo?.name ?: "")),
-                                            )
                                         } else {
                                             SnackbarManager.show(context.getString(R.string.steam_uninstall_failed))
                                         }
@@ -1353,10 +1328,6 @@ class SteamAppScreen : BaseAppScreen() {
                         MarkerUtils.removeMarker(getAppDirPath(gameId), Marker.STEAM_COLDCLIENT_USED)
                     }
 
-                    PostHog.capture(
-                        event = "game_install_started",
-                        properties = mapOf("game_name" to (appInfo?.name ?: ""))
-                    )
                     CoroutineScope(Dispatchers.IO).launch {
                         SteamService.downloadApp(gameId, dlcAppIds, branch = branch, isUpdateOrVerify = false)
                     }

@@ -26,7 +26,7 @@ import org.json.JSONObject
 import timber.log.Timber
 
 /**
- * Service for fetching best configurations for games from GameNative API.
+ * Service for fetching best configurations for games from HyperNative API.
  */
 object BestConfigService {
     private const val API_BASE_URL = "https://api.gamenative.app/api/best-config"

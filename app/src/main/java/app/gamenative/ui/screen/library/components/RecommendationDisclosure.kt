@@ -8,7 +8,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.res.stringResource
 import app.gamenative.PrefManager
 import app.gamenative.R
-import com.posthog.PostHog
 
 @Composable
 fun RecommendationDisclosureDialog(
@@ -16,17 +15,10 @@ fun RecommendationDisclosureDialog(
     onDismiss: () -> Unit,
     source: String = "tab",
 ) {
-    fun capture(event: String) {
-        if (PrefManager.usageAnalyticsEnabled) {
-            PostHog.capture(event = event, properties = mapOf("source" to source))
-        }
-    }
     LaunchedEffect(Unit) {
-        capture("rec_disclosure_shown")
     }
     AlertDialog(
         onDismissRequest = {
-            capture("rec_disclosure_declined")
             onDismiss()
         },
         title = { Text(text = stringResource(R.string.rec_disclosure_title)) },
@@ -34,7 +26,6 @@ fun RecommendationDisclosureDialog(
         confirmButton = {
             TextButton(
                 onClick = {
-                    capture("rec_disclosure_allowed")
                     onContinue()
                 },
             ) {
@@ -43,7 +34,6 @@ fun RecommendationDisclosureDialog(
         },
         dismissButton = {
             TextButton(onClick = {
-                capture("rec_disclosure_declined")
                 onDismiss()
             }) {
                 Text(text = stringResource(R.string.rec_disclosure_not_now))

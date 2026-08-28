@@ -461,9 +461,9 @@ class NexusApiClient(
         Request.Builder()
             .url(url)
             .addHeader("Accept", "application/json")
-            .addHeader("Application-Name", "GameNative")
+            .addHeader("Application-Name", "HyperNative")
             .addHeader("Application-Version", BuildConfig.VERSION_NAME)
-            .addHeader("User-Agent", "GameNative/${BuildConfig.VERSION_NAME}")
+            .addHeader("User-Agent", "HyperNative/${BuildConfig.VERSION_NAME}")
 
     private fun execute(request: Request, displayPath: String): String {
         client.newCall(request).execute().use { response ->
@@ -523,7 +523,7 @@ class NexusApiClient(
     ): NexusApiException {
         val (message, downloadReason) = when (statusCode) {
             400 -> if (hasAuthorization) {
-                "Nexus rejected this website download authorization. Make sure the browser and GameNative use the same Nexus account." to
+                "Nexus rejected this website download authorization. Make sure the browser and HyperNative use the same Nexus account." to
                     NexusApiErrorReason.DOWNLOAD_AUTHORIZATION_INVALID
             } else {
                 return this

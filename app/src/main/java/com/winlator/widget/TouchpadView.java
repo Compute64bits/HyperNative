@@ -606,7 +606,7 @@ public class TouchpadView extends View implements View.OnCapturedPointerListener
     }
 
     private boolean handleLegacyTouchscreenEvent(MotionEvent event) {
-        // Original GameNative touchscreen handling (unused; kept for reference)
+        // Original HyperNative touchscreen handling (unused; kept for reference)
         int action = event.getActionMasked();
 
         switch (action) {
@@ -643,7 +643,7 @@ public class TouchpadView extends View implements View.OnCapturedPointerListener
         return true;
     }
 
-    // Original GameNative touchscreen handler methods
+    // Original HyperNative touchscreen handler methods
     private void handleTouchDown(MotionEvent event) {
         float[] transformedPoint = XForm.transformPoint(xform, event.getX(), event.getY());
         if (xServer.isRelativeMouseMovement())

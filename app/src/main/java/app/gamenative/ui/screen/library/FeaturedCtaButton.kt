@@ -33,8 +33,6 @@ import app.gamenative.service.SteamService
 import app.gamenative.service.SteamWishlistService
 import app.gamenative.ui.component.focusRing
 import app.gamenative.ui.util.SnackbarManager
-import app.gamenative.utils.ConversionTracker
-import com.posthog.PostHog
 import kotlinx.coroutines.launch
 
 @Composable
@@ -64,17 +62,6 @@ internal fun FeaturedCtaButton(
     val onClick: () -> Unit = onClick@{
         if (inert) return@onClick
 
-        if (PrefManager.usageAnalyticsEnabled) {
-            PostHog.capture(
-                event = "featured_action_clicked",
-                properties = mapOf(
-                    "campaign_id" to campaignId,
-                    "action_label" to action.label,
-                    "url" to action.url,
-                    "source" to recSource,
-                ),
-            )
-        }
         if (cta == null) {
             openUrl()
         } else {
@@ -84,12 +71,6 @@ internal fun FeaturedCtaButton(
                 busy = false
                 if (ok) {
                     done = true
-                    ConversionTracker.featuredConversion(
-                        campaignId = campaignId,
-                        actionType = action.type,
-                        appId = action.appId,
-                        source = recSource,
-                    )
                 } else {
                     SnackbarManager.show(context.getString(R.string.featured_action_failed))
                     openUrl()

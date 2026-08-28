@@ -139,7 +139,6 @@ import app.gamenative.utils.SteamTokenLogin
 import app.gamenative.utils.SteamUtils
 import app.gamenative.utils.downloader.WinComponentDownloader
 import app.gamenative.utils.WineProcessSnapshotHelper
-import com.posthog.PostHog
 import com.winlator.alsaserver.ALSAClient
 import com.winlator.container.Container
 import com.winlator.container.ContainerManager
@@ -1100,11 +1099,10 @@ fun XServerScreen(
 
     // Shows the soft keyboard, anchored to [anchor]. Handles the Android 12+
     // post-delay quirk and routes input to the external display IME when needed.
-    val showSoftKeyboard: (View, String) -> Unit = { anchor, analyticsEvent ->
+    val showSoftKeyboard: (View, String) -> Unit = { anchor, _ ->
         anchor.post {
             if (anchor.windowToken != null) {
                 val show = {
-                    if (PrefManager.usageAnalyticsEnabled) PostHog.capture(event = analyticsEvent)
                     val isExternalDisplaySession =
                         (anchor.display?.displayId ?: Display.DEFAULT_DISPLAY) != Display.DEFAULT_DISPLAY
 
@@ -1133,10 +1131,8 @@ fun XServerScreen(
 
             QuickMenuAction.INPUT_CONTROLS -> {
                 if (areControlsVisible) {
-                    if (PrefManager.usageAnalyticsEnabled) PostHog.capture(event = "onscreen_controller_disabled")
                     hideInputControls()
                 } else {
-                    if (PrefManager.usageAnalyticsEnabled) PostHog.capture(event = "onscreen_controller_enabled")
                     val manager = PluviaApp.inputControlsManager
                     val profiles = manager?.getProfiles(false) ?: listOf()
                     if (profiles.isNotEmpty()) {
@@ -1171,7 +1167,6 @@ fun XServerScreen(
             }
 
             QuickMenuAction.EDIT_CONTROLS -> {
-                if (PrefManager.usageAnalyticsEnabled) PostHog.capture(event = "edit_controls_in_game")
                 keepPausedForEditor = true
 
                 // Get or create profile for this container
@@ -1319,14 +1314,12 @@ fun XServerScreen(
             }
 
             QuickMenuAction.EDIT_PHYSICAL_CONTROLLER -> {
-                if (PrefManager.usageAnalyticsEnabled) PostHog.capture(event = "edit_physical_controller_from_menu")
                 keepPausedForEditor = true
                 showPhysicalControllerDialog = true
                 true
             }
 
             QuickMenuAction.RADIAL_MENU -> {
-                if (PrefManager.usageAnalyticsEnabled) PostHog.capture(event = "edit_radial_menu_from_menu")
                 PluviaApp.radialMenuCoordinator?.showSettingsDialog() == true
             }
 
@@ -1335,27 +1328,10 @@ fun XServerScreen(
                 isPerformanceHudEnabled = enabled
                 PrefManager.showFps = enabled
                 updatePerformanceHud(enabled)
-                if (PrefManager.usageAnalyticsEnabled) {
-                    PostHog.capture(
-                        event = "performance_hud_toggled",
-                        properties = mapOf("enabled" to enabled),
-                    )
-                }
                 false
             }
 
             QuickMenuAction.EXIT_GAME -> {
-                PostHog.capture(
-                    event = "game_closed",
-                    properties = buildMap {
-                        put("game_name", ContainerUtils.resolveGameName(appId))
-                        put("game_store", ContainerUtils.extractGameSourceFromContainerId(appId).name)
-                        if (PrefManager.usageAnalyticsEnabled) {
-                            put("max_controllers", ControllerManager.getInstance().sessionUsedControllerCount)
-                            put("external_controller_used", ControllerManager.getInstance().sessionUsedExternalController)
-                        }
-                    },
-                )
                 imeInputReceiver?.hideKeyboard()
                 // Resume processes before exiting so they can receive SIGTERM cleanly.
                 // Don't resume audio to avoid resume->suspend race condition causing ANR.
@@ -1376,7 +1352,6 @@ fun XServerScreen(
             ?.isVisible(WindowInsetsCompat.Type.ime()) == true
 
         if (imeVisible) {
-            if (PrefManager.usageAnalyticsEnabled) PostHog.capture(event = "onscreen_keyboard_disabled")
             imeInputReceiver?.hideKeyboard()
             view.post {
                 if (Build.VERSION.SDK_INT >= 30) {
@@ -4591,16 +4566,7 @@ private fun exit(
         return
     }
 
-    PostHog.capture(
-        event = "game_exited",
-        properties = mapOf(
-            "game_name" to ContainerUtils.resolveGameName(appId),
-            "game_store" to ContainerUtils.extractGameSourceFromContainerId(appId).name,
-            "session_length" to (frameRating?.sessionLengthSec ?: 0),
-            "avg_fps" to (frameRating?.avgFPS ?: 0.0),
-            "container_config" to container.containerJson,
-        ),
-    )
+    Timber.i("Game exited: %s", ContainerUtils.resolveGameName(appId))
 
     // Store session data in container metadata
     frameRating?.let { rating ->
@@ -5466,7 +5432,7 @@ private suspend fun extractWinComponentFiles(
 
             if (!container.wineVersion.contains("arm64ec") && identifier.contains("opengl") && useNative) continue
 
-            // Note: GameNative do not bundle directinput and directinput8 dlls, need to skip them and use wine/proton dll instead
+            // Note: HyperNative do not bundle directinput and directinput8 dlls, need to skip them and use wine/proton dll instead
             if (useNative && (identifier != "directinput8" && identifier != "directinput")) {
                 // Download or use cached/bundled wincomponent
                 val componentFile = WinComponentDownloader.ensureWinComponentAvailable(

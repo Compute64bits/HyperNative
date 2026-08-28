@@ -3,9 +3,9 @@ package app.gamenative.service
 import app.gamenative.data.GameProcessInfo
 
 /**
- * Tracks the single Steam game session currently managed by GameNative.
+ * Tracks the single Steam game session currently managed by HyperNative.
  *
- * GameNative only supports one active game at a time, so storing a single slot
+ * HyperNative only supports one active game at a time, so storing a single slot
  * avoids stale entries being re-announced after reconnect.
  */
 object ActiveGameRegistry {

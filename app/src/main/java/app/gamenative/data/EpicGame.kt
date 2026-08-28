@@ -11,7 +11,7 @@ import app.gamenative.enums.AppType
  */
 @Entity(tableName = "epic_games")
 data class EpicGame(
-    // Generated INT for GameNative to track Epic. For any epic-API-related functionality, use catalogId.
+    // Generated INT for HyperNative to track Epic. For any epic-API-related functionality, use catalogId.
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo("id")
     val id: Int = 0,

@@ -13,7 +13,7 @@ import org.json.JSONObject
 import timber.log.Timber
 
 /**
- * Service for fetching game compatibility information from GameNative API.
+ * Service for fetching game compatibility information from HyperNative API.
  */
 object GameCompatibilityService {
     private const val API_BASE_URL = "https://api.gamenative.app/api/game-runs"

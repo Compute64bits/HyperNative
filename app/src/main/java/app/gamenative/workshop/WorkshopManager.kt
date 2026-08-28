@@ -3950,7 +3950,7 @@ object WorkshopManager {
     }
 
     /**
-     * Removes GameNative Workshop exposure artifacts accidentally created inside
+     * Removes HyperNative Workshop exposure artifacts accidentally created inside
      * trees covered by a per-game compatibility override. Nested
      * steam_settings/mods links can expose the same Workshop files twice.
      */

@@ -629,7 +629,7 @@ class EpicService : Service() {
 
     private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
-    // Track active downloads by GameNative Int ID
+    // Track active downloads by HyperNative Int ID
     private val activeDownloads = ConcurrentHashMap<Int, DownloadInfo>()
 
     private val onEndProcess: (AndroidEvent.EndProcess) -> Unit = { stop() }

@@ -20,10 +20,6 @@ val keystoreProperties: Properties? = if (keystorePropertiesFile.exists()) {
     }
 } else null
 
-// Add PostHog API key and host as build-time variables
-val posthogApiKey: String = project.findProperty("POSTHOG_API_KEY") as String? ?: System.getenv("POSTHOG_API_KEY") ?: ""
-val posthogHost: String = project.findProperty("POSTHOG_HOST") as String? ?: System.getenv("POSTHOG_HOST") ?: "https://us.i.posthog.com"
-
 val metaAppId: String = project.findProperty("META_APP_ID") as String? ?: System.getenv("META_APP_ID") ?: ""
 val productSku: String = project.findProperty("PRODUCT_SKU") as String? ?: System.getenv("PRODUCT_SKU") ?: ""
 
@@ -71,8 +67,6 @@ android {
         fun secret(name: String) =
             project.findProperty(name) as String? ?: System.getenv(name) ?: ""
 
-        buildConfigField("String", "POSTHOG_API_KEY", "\"${secret("POSTHOG_API_KEY")}\"")
-        buildConfigField("String", "POSTHOG_HOST",  "\"${secret("POSTHOG_HOST")}\"")
         buildConfigField("String", "STEAMGRIDDB_API_KEY", "\"${secret("STEAMGRIDDB_API_KEY")}\"")
         buildConfigField("String", "CLOUD_PROJECT_NUMBER", "\"${secret("CLOUD_PROJECT_NUMBER")}\"")
         val iconValue = "@mipmap/ic_launcher"
@@ -426,9 +420,6 @@ dependencies {
     testImplementation(libs.zstd.jni)
     testImplementation(libs.orgJson)
     testImplementation(libs.mockwebserver)
-
-    // Add PostHog Android SDK dependency
-    implementation("com.posthog:posthog-android:3.8.0")
 
     implementation("com.auth0.android:jwtdecode:2.0.2")
 

@@ -5,7 +5,7 @@ import org.json.JSONArray
 import org.json.JSONObject
 
 /**
- * Persists only non-secret request metadata while GameNative hands a free user
+ * Persists only non-secret request metadata while HyperNative hands a free user
  * to the Nexus website. The signed NXM key itself is never written to disk.
  */
 object NexusPendingDownloadStore {

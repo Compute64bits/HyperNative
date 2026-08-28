@@ -10,7 +10,7 @@ import org.json.JSONObject
 import timber.log.Timber
 
 /**
- * Fetches game compatibility stats from the GameNative API.
+ * Fetches game compatibility stats from the HyperNative API.
  *
  * Two endpoints share the same response shape - one keyed by device + GPU, one keyed by GPU only:
  *

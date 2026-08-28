@@ -15,14 +15,14 @@ import java.util.zip.ZipOutputStream
 
 object SlayTheSpireModTheSpireCompatibility {
     const val APP_ID = 646570
-    const val HEADLESS_LAUNCHER_JAR = "GameNativeModTheSpireLauncher.jar"
+    const val HEADLESS_LAUNCHER_JAR = "HyperNativeModTheSpireLauncher.jar"
 
     private const val MOD_THE_SPIRE_WORKSHOP_ID = "1605060445"
     private const val MOD_JAR_MANIFEST = ".gamenative_workshop_jars"
     private const val MOD_THE_SPIRE_MARKER = ".gamenative_modthespire"
     private const val MOD_THE_SPIRE_ARGS = ".gamenative_modthespire_args"
     private const val HEADLESS_LAUNCHER_CLASS =
-        "com.evacipated.cardcrawl.modthespire.GameNativeLauncher"
+        "com.evacipated.cardcrawl.modthespire.HyperNativeLauncher"
     private const val MAX_METADATA_ENTRY_BYTES = 64 * 1024
     private val MOD_THE_SPIRE_JVM_ARGS = listOf(
         "-Xmx1G",

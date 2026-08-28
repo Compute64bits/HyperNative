@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # convert-wcp-to-tzst.sh
 # Converts a FEX .wcp release (XZ-compressed tar) into a fexcore .tzst file
-# compatible with the GameNative app assets format.
+# compatible with the HyperNative app assets format.
 #
 # Usage: ./tools/convert-wcp-to-tzst.sh <input.wcp> <output.tzst>
 # Example: ./tools/convert-wcp-to-tzst.sh FEX-2603.wcp app/src/main/assets/fexcore/fexcore-2603.tzst

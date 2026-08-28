@@ -20,7 +20,7 @@ class NotificationHelper @Inject constructor(@ApplicationContext private val con
 
     companion object {
         private const val CHANNEL_ID = "pluvia_foreground_service"
-        private const val CHANNEL_NAME = "GameNative Foreground Service"
+        private const val CHANNEL_NAME = "HyperNative Foreground Service"
         private const val GROUP_KEY = "app.gamenative.services"
 
         const val NOTIFICATION_ID_STEAM = 1
@@ -60,7 +60,7 @@ class NotificationHelper @Inject constructor(@ApplicationContext private val con
             CHANNEL_NAME,
             NotificationManager.IMPORTANCE_LOW,
         ).apply {
-            description = "Allows to display GameNative foreground notifications"
+            description = "Allows to display HyperNative foreground notifications"
             setShowBadge(false)
         }
 
@@ -100,7 +100,7 @@ class NotificationHelper @Inject constructor(@ApplicationContext private val con
      * Builds a per-service foreground notification. Each foreground service must
      * post its own notification (Android requires one notification per FGS), but
      * they share a notification group so the system collapses them into a single
-     * "GameNative · Connected" entry in the shade.
+     * "HyperNative · Connected" entry in the shade.
      *
      * Callers must invoke [markActive] after their `startForeground(...)` call
      * so the group summary is posted/updated.

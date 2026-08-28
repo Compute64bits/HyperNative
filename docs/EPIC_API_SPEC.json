@@ -5,8 +5,8 @@
     "description": "REST API specification for Epic Games Store platform integration including authentication, library management, game catalog, and cloud saves. Based on Legendary CLI implementation.",
     "version": "1.0.0",
     "contact": {
-      "name": "GameNative",
-      "url": "https://github.com/GameNative"
+      "name": "HyperNative",
+      "url": "https://github.com/HyperNative"
     }
   },
   "servers": [
