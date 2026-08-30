@@ -79,7 +79,7 @@ Grab the latest pre-built APK from GitHub Releases :
 
 1. **Clone the repository:**
    ```bash
-   git clone [https://github.com/Compute64bits/HyperNative.git](https://github.com/Compute64bits/HyperNative.git)
+   git clone https://github.com/Compute64bits/HyperNative.git
    cd HyperNative
    ```
 
