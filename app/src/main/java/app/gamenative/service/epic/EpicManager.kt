@@ -217,7 +217,9 @@ class EpicManager @Inject constructor(
             // sufficient since a library scan completes in seconds and the token
             // has a 5-minute expiry buffer in getStoredCredentials.
             val credentialsResult = EpicAuthManager.getStoredCredentials(context)
-            val accessToken = credentialsResult.getOrNull()?.accessToken
+            val credentials = credentialsResult.getOrNull()
+            val accessToken = credentials?.accessToken
+            val epicAccountId = credentials?.accountId ?: ""
             if (credentialsResult.isFailure || accessToken.isNullOrEmpty()) {
                 val error = credentialsResult.exceptionOrNull() ?: Exception("No access token")
                 Timber.tag("Epic").e(error, "Cannot refresh library: ${error.message}")
@@ -232,7 +234,7 @@ class EpicManager @Inject constructor(
                 if (result.isSuccess) {
                     val epicGame = result.getOrNull()
                     if (epicGame != null) {
-                        epicGames.add(epicGame)
+                        epicGames.add(epicGame.copy(accountId = epicAccountId))
                         processedCount++
                         Timber.tag("Epic").d("Refreshed Game: ${epicGame.title}")
                     }

@@ -27,6 +27,70 @@ internal val ROOM_MIGRATION_V24_to_V25 = object : Migration(24, 25) {
     }
 }
 
+internal val ROOM_MIGRATION_V27_to_V28 = object : Migration(27, 28) {
+    override fun migrate(connection: SQLiteConnection) {
+        migrateGogGamesToMultiAccountV28(connection)
+    }
+}
+
+private fun migrateGogGamesToMultiAccountV28(connection: SQLiteConnection) {
+    // Create new table with auto-generated primary key and indexed 'id' column
+    connection.execSQL(
+        """
+        CREATE TABLE IF NOT EXISTS `gog_games_v28` (
+            `internal_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+            `id` TEXT NOT NULL,
+            `title` TEXT NOT NULL,
+            `slug` TEXT NOT NULL,
+            `download_size` INTEGER NOT NULL,
+            `install_size` INTEGER NOT NULL,
+            `is_installed` INTEGER NOT NULL,
+            `install_path` TEXT NOT NULL,
+            `image_url` TEXT NOT NULL,
+            `icon_url` TEXT NOT NULL,
+            `background_url` TEXT NOT NULL DEFAULT '',
+            `vertical_cover_url` TEXT NOT NULL DEFAULT '',
+            `description` TEXT NOT NULL,
+            `release_date` TEXT NOT NULL,
+            `developer` TEXT NOT NULL,
+            `publisher` TEXT NOT NULL,
+            `genres` TEXT NOT NULL,
+            `languages` TEXT NOT NULL,
+            `last_played` INTEGER NOT NULL,
+            `play_time` INTEGER NOT NULL,
+            `type` TEXT NOT NULL,
+            `exclude` INTEGER NOT NULL DEFAULT 0,
+            `account_id` TEXT NOT NULL DEFAULT ''
+        )
+        """.trimIndent(),
+    )
+
+    // Copy data from old table
+    connection.execSQL(
+        """
+        INSERT INTO `gog_games_v28` (
+            `id`, `title`, `slug`, `download_size`, `install_size`, `is_installed`,
+            `install_path`, `image_url`, `icon_url`, `background_url`, `vertical_cover_url`,
+            `description`, `release_date`, `developer`, `publisher`, `genres`, `languages`,
+            `last_played`, `play_time`, `type`, `exclude`, `account_id`
+        )
+        SELECT
+            `id`, `title`, `slug`, `download_size`, `install_size`, `is_installed`,
+            `install_path`, `image_url`, `icon_url`, `background_url`, `vertical_cover_url`,
+            `description`, `release_date`, `developer`, `publisher`, `genres`, `languages`,
+            `last_played`, `play_time`, `type`, `exclude`, `account_id`
+        FROM `gog_games`
+        """.trimIndent(),
+    )
+
+    // Drop old table and rename
+    connection.execSQL("DROP TABLE `gog_games`")
+    connection.execSQL("ALTER TABLE `gog_games_v28` RENAME TO `gog_games`")
+
+    // Create index on 'id' column
+    connection.execSQL("CREATE INDEX IF NOT EXISTS `index_gog_games_id` ON `gog_games` (`id`)")
+}
+
 private fun migrateManagedModSourcesToV25(connection: SQLiteConnection) {
     connection.execSQL(
         """

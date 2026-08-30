@@ -2,6 +2,7 @@ package app.gamenative.data
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 import app.gamenative.enums.AppType
 
@@ -9,9 +10,12 @@ import app.gamenative.enums.AppType
  * GOG Game entity for Room database
  * Represents a game from the GOG platform
  */
-@Entity(tableName = "gog_games")
+@Entity(tableName = "gog_games", indices = [Index("id")])
 data class GOGGame(
-    @PrimaryKey
+    @PrimaryKey(autoGenerate = true)
+    @ColumnInfo("internal_id")
+    val internalId: Int = 0,
+
     @ColumnInfo("id")
     val id: String,
 
@@ -74,6 +78,10 @@ data class GOGGame(
 
     @ColumnInfo(name = "exclude", defaultValue = "0")
     val exclude: Boolean = false,
+
+    /** Platform account ID that owns this game (empty = unknown/legacy) */
+    @ColumnInfo(name = "account_id", defaultValue = "")
+    val accountId: String = "",
 ) {
     companion object {
         const val GOG_IMAGE_BASE_URL = "https://images.gog.com/images"

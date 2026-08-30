@@ -359,6 +359,14 @@
     <string name="denuvo">Denuvo</string>
     <string name="describe_what_happened">Опишите, что произошло</string>
     <string name="destination_downloads">Загрузки и хранилище</string>
+    <string name="destination_discover">Обзор</string>
+    <string name="destination_my_games">Мои игры</string>
+    <string name="destination_settings">Настройки</string>
+    <string name="settings_section_profile">Профиль</string>
+    <string name="settings_section_accounts">Аккаунты</string>
+    <string name="settings_section_library_options">Настройки библиотеки</string>
+
+
     <string name="downloads_section_title">Загрузки</string>
     <string name="destination_library">Библиотека</string>
     <string name="developer">Разработчик</string>
@@ -2269,4 +2277,23 @@ https://gamenative.app
     <string name="favorite_added">Добавлено в избранное</string>
     <string name="favorite_added_named">%1$s добавлено в избранное</string>
     <string name="xr_refresh_rate">Частота обновления VR</string>
+    <string name="accounts_steam">Аккаунты Steam</string>
+    <string name="accounts_gog">Аккаунты GOG</string>
+    <string name="accounts_epic">Аккаунты Epic</string>
+    <string name="accounts_amazon">Аккаунты Amazon Games</string>
+    <string name="add_account">Добавить аккаунт</string>
+    <string name="remove_account">Удалить аккаунт</string>
+    <string name="remove_account_confirmation">Удалить «%s» из ваших аккаунтов?</string>
+    <string name="set_as_primary">Сделать основным</string>
+    <string name="primary_account">Основной</string>
+    <string name="logout">Выйти</string>
+    <string name="logout_confirm_title">Выйти?</string>
+    <string name="logout_confirm_message">Это удалит ваши учётные данные и очистит библиотеку с этого устройства. Вы можете войти снова в любое время.</string>
+    <string name="logout_confirm_message_specific">Это удалит аккаунт \"%s\" и его учётные данные с этого устройства. Вы можете войти снова в любое время.</string>
+    <string name="logout_confirm">Выйти</string>
+    <string name="logout_account">Выйти из %s</string>
+    <string name="switch_account">Сменить аккаунт</string>
+    <string name="no_accounts_connected">Нет подключённых аккаунтов</string>
+    <string name="launch_with_account">Запустить с: %s</string>
+    <string name="select_account">Выбрать аккаунт</string>
 </resources>

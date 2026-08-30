@@ -243,6 +243,7 @@ class PluviaApp : SplitCompatApplication() {
         var achievementWatcher: app.gamenative.service.AchievementWatcher? = null
 
         var isOverlayPaused by mutableStateOf(false)
+        var isAmbientDownloadActive by mutableStateOf(false)
         @Volatile
         var isActivityInForeground: Boolean = true
 

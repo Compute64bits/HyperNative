@@ -1545,10 +1545,13 @@ abstract class BaseAppScreen {
         // Render the common UI
         val accountManager = PluviaApp.getInstance().accountManager
         val platform = app.gamenative.account.AccountManager.platformFromGameSource(libraryItem.gameSource)
+        val platformAppId = libraryItem.appId.removePrefix("${libraryItem.gameSource.name}_")
         val allAccounts by if (platform.isNotEmpty()) {
-            accountManager.getAccountsFlow(platform).collectAsStateWithLifecycle(initialValue = emptyList())
+            accountManager.getAccountsThatOwnGameFlow(platform, platformAppId)
+                .collectAsStateWithLifecycle(initialValue = emptyList())
         } else {
-            remember { kotlinx.coroutines.flow.flowOf(emptyList<app.gamenative.data.PlatformAccount>()) }.collectAsStateWithLifecycle(initialValue = emptyList())
+            remember { kotlinx.coroutines.flow.flowOf(emptyList<app.gamenative.data.PlatformAccount>()) }
+                .collectAsStateWithLifecycle(initialValue = emptyList())
         }
         val gameAccountPref by if (platform.isNotEmpty()) {
             accountManager.getGameAccountFlow(libraryItem.appId).collectAsStateWithLifecycle(initialValue = null)
@@ -1559,7 +1562,14 @@ abstract class BaseAppScreen {
             if (gameAccountPref != null) {
                 allAccounts.find { it.accountId == gameAccountPref!!.accountId }
             } else {
-                allAccounts.find { it.isPrimary }
+                allAccounts.find { it.isPrimary } ?: allAccounts.firstOrNull()
+            }
+        }
+
+        // Auto-set game account preference if primary doesn't own the game
+        LaunchedEffect(currentLaunchAccount, allAccounts, gameAccountPref) {
+            if (platform.isNotEmpty() && currentLaunchAccount != null && gameAccountPref == null && !currentLaunchAccount.isPrimary) {
+                accountManager.setGameAccount(libraryItem.appId, currentLaunchAccount.accountId, platform)
             }
         }
 

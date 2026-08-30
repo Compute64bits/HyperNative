@@ -90,6 +90,14 @@
     <string name="confirm_delete">Confirmă ștergerea</string>
     <string name="destination_library">Bibliotecă</string>
     <string name="destination_downloads">Descărcări și stocare</string>
+    <string name="destination_discover">Descoperă</string>
+    <string name="destination_my_games">Jocurile mele</string>
+    <string name="destination_settings">Setări</string>
+    <string name="settings_section_profile">Profil</string>
+    <string name="settings_section_accounts">Conturi</string>
+    <string name="settings_section_library_options">Opțiuni bibliotecă</string>
+
+
     <string name="downloads_section_title">Descărcări</string>
 
     <string name="downloads_empty">Nicio descărcare activă</string>
@@ -2340,4 +2348,23 @@
     <string name="favorite_added">Adăugat la favorite</string>
     <string name="favorite_added_named">%1$s adăugat la favorite</string>
     <string name="xr_refresh_rate">Rată de reîmprospătare VR</string>
+    <string name="accounts_steam">Conturi Steam</string>
+    <string name="accounts_gog">Conturi GOG</string>
+    <string name="accounts_epic">Conturi Epic</string>
+    <string name="accounts_amazon">Conturi Amazon Games</string>
+    <string name="add_account">Adaugă cont</string>
+    <string name="remove_account">Elimină contul</string>
+    <string name="remove_account_confirmation">Elimini „%s” din conturile tale?</string>
+    <string name="set_as_primary">Setează ca principal</string>
+    <string name="primary_account">Principal</string>
+    <string name="logout">Deconectare</string>
+    <string name="logout_confirm_title">Deconectare?</string>
+    <string name="logout_confirm_message">Aceasta va elimina datele de autentificare și va șterge biblioteca de pe acest dispozitiv. Vă puteți conecta din nou oricând.</string>
+    <string name="logout_confirm_message_specific">Aceasta va elimina contul \"%s\" și datele sale de autentificare de pe acest dispozitiv. Vă puteți conecta din nou oricând.</string>
+    <string name="logout_confirm">Deconectare</string>
+    <string name="logout_account">Deconectare %s</string>
+    <string name="switch_account">Schimbă contul</string>
+    <string name="no_accounts_connected">Niciun cont conectat</string>
+    <string name="launch_with_account">Lansează cu: %s</string>
+    <string name="select_account">Selectează contul</string>
 </resources>

@@ -99,6 +99,14 @@
     <string name="confirm_delete">削除の確認</string>
     <string name="destination_library">ライブラリ</string>
     <string name="destination_downloads">ダウンロードとストレージ</string>
+    <string name="destination_discover">ディスカバー</string>
+    <string name="destination_my_games">マイゲーム</string>
+    <string name="destination_settings">設定</string>
+    <string name="settings_section_profile">プロフィール</string>
+    <string name="settings_section_accounts">アカウント</string>
+    <string name="settings_section_library_options">ライブラリオプション</string>
+
+
     <string name="downloads_section_title">ダウンロード</string>
     <string name="downloads_empty">アクティブなダウンロードはありません</string>
     <string name="downloads_overview_subtitle">アクティブ・一時停止・再開可能なダウンロードを管理</string>
@@ -2290,4 +2298,23 @@
     <string name="favorite_added">お気に入りに追加しました</string>
     <string name="favorite_added_named">%1$s をお気に入りに追加しました</string>
     <string name="xr_refresh_rate">VRリフレッシュレート</string>
+    <string name="accounts_steam">Steamアカウント</string>
+    <string name="accounts_gog">GOGアカウント</string>
+    <string name="accounts_epic">Epicアカウント</string>
+    <string name="accounts_amazon">Amazon Gamesアカウント</string>
+    <string name="add_account">アカウントを追加</string>
+    <string name="remove_account">アカウントを削除</string>
+    <string name="remove_account_confirmation">「%s」をアカウントから削除しますか？</string>
+    <string name="set_as_primary">メインに設定</string>
+    <string name="primary_account">メイン</string>
+    <string name="logout">ログアウト</string>
+    <string name="logout_confirm_title">ログアウトしますか？</string>
+    <string name="logout_confirm_message">これにより、認証情報が削除され、このデバイスのライブラリがクリアされます。いつでも再度サインインできます。</string>
+    <string name="logout_confirm_message_specific">これにより、アカウント「%s」とその認証情報がこのデバイスから削除されます。いつでも再度サインインできます。</string>
+    <string name="logout_confirm">ログアウト</string>
+    <string name="logout_account">%s をログアウト</string>
+    <string name="switch_account">アカウントを切り替え</string>
+    <string name="no_accounts_connected">接続されたアカウントがありません</string>
+    <string name="launch_with_account">起動：%s</string>
+    <string name="select_account">アカウントを選択</string>
 </resources>

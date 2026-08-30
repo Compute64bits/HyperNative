@@ -85,6 +85,14 @@
     <string name="confirm_delete">Löschen bestätigen</string>
     <string name="destination_library">Bibliothek</string>
     <string name="destination_downloads">Downloads &amp; Speicher</string>
+    <string name="destination_discover">Entdecken</string>
+    <string name="destination_my_games">Meine Spiele</string>
+    <string name="destination_settings">Einstellungen</string>
+    <string name="settings_section_profile">Profil</string>
+    <string name="settings_section_accounts">Konten</string>
+    <string name="settings_section_library_options">Bibliotheksoptionen</string>
+
+
     <string name="downloads_section_title">Downloads</string>
 
     <string name="downloads_empty">Keine aktiven Downloads</string>
@@ -2277,4 +2285,23 @@
     <string name="favorite_added">Zu Favoriten hinzugefügt</string>
     <string name="favorite_added_named">%1$s zu Favoriten hinzugefügt</string>
     <string name="xr_refresh_rate">VR-Bildwiederholrate</string>
+    <string name="accounts_steam">Steam-Konten</string>
+    <string name="accounts_gog">GOG-Konten</string>
+    <string name="accounts_epic">Epic-Konten</string>
+    <string name="accounts_amazon">Amazon Games-Konten</string>
+    <string name="add_account">Konto hinzufügen</string>
+    <string name="remove_account">Konto entfernen</string>
+    <string name="remove_account_confirmation">„%s“ aus Ihren Konten entfernen?</string>
+    <string name="set_as_primary">Als Primärkonto festlegen</string>
+    <string name="primary_account">Primär</string>
+    <string name="logout">Abmelden</string>
+    <string name="logout_confirm_title">Abmelden?</string>
+    <string name="logout_confirm_message">Hierdurch werden Ihre Anmeldedaten entfernt und Ihre Bibliothek von diesem Gerät gelöscht. Sie können sich jederzeit erneut anmelden.</string>
+    <string name="logout_confirm_message_specific">Dadurch wird das Konto \"%s\" und dessen Anmeldedaten von diesem Gerät entfernt. Sie können sich jederzeit erneut anmelden.</string>
+    <string name="logout_confirm">Abmelden</string>
+    <string name="logout_account">%s abmelden</string>
+    <string name="switch_account">Konto wechseln</string>
+    <string name="no_accounts_connected">Keine Konten verbunden</string>
+    <string name="launch_with_account">Starten mit: %s</string>
+    <string name="select_account">Konto auswählen</string>
 </resources>

@@ -1437,6 +1437,10 @@ fun PluviaMain(
                         },
                         isOffline = isOffline,
                         isSteamConnected = state.isSteamConnected,
+                        appTheme = state.appTheme,
+                        paletteStyle = state.paletteStyle,
+                        onAppTheme = viewModel::setTheme,
+                        onPaletteStyle = viewModel::setPalette,
                     )
                 }
 

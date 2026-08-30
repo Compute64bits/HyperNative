@@ -27,6 +27,7 @@ class AmazonManager @Inject constructor(
             return@withContext
         }
         val credentials = credentialsResult.getOrNull()!!
+        val amazonAccountId = credentials.deviceSerial
 
         val games = AmazonApiClient.getEntitlements(
             bearerToken = credentials.accessToken,
@@ -38,7 +39,8 @@ class AmazonManager @Inject constructor(
             return@withContext
         }
 
-        amazonGameDao.upsertPreservingInstallStatus(games)
+        val gamesWithAccount = games.map { it.copy(accountId = amazonAccountId) }
+        amazonGameDao.upsertPreservingInstallStatus(gamesWithAccount)
         Timber.i("[Amazon] Library refresh complete — ${games.size} game(s) in DB")
     }
 

@@ -46,6 +46,14 @@
     <string name="confirm_delete">Bekræft sletning</string>
     <string name="destination_library">Bibliotek</string>
     <string name="destination_downloads">Downloads &amp; lager</string>
+    <string name="destination_discover">Opdag</string>
+    <string name="destination_my_games">Mine spil</string>
+    <string name="destination_settings">Indstillinger</string>
+    <string name="settings_section_profile">Profil</string>
+    <string name="settings_section_accounts">Konti</string>
+    <string name="settings_section_library_options">Biblioteksindstillinger</string>
+
+
     <string name="downloads_section_title">Downloads</string>
 
     <string name="downloads_empty">Ingen aktive downloads</string>
@@ -2206,4 +2214,23 @@
     <string name="favorite_added">Føjet til favoritter</string>
     <string name="favorite_added_named">Føjede %1$s til favoritter</string>
     <string name="xr_refresh_rate">VR-opdateringsfrekvens</string>
+    <string name="accounts_steam">Steam-konti</string>
+    <string name="accounts_gog">GOG-konti</string>
+    <string name="accounts_epic">Epic-konti</string>
+    <string name="accounts_amazon">Amazon Games-konti</string>
+    <string name="add_account">Tilføj konto</string>
+    <string name="remove_account">Fjern konto</string>
+    <string name="remove_account_confirmation">Fjern "%s" fra dine konti?</string>
+    <string name="set_as_primary">Angiv som primær</string>
+    <string name="primary_account">Primær</string>
+    <string name="logout">Log ud</string>
+    <string name="logout_confirm_title">Log ud?</string>
+    <string name="logout_confirm_message">Dette vil fjerne dine legitimationsoplysninger og rydde dit bibliotek fra denne enhed. Du kan logge ind igen når som helst.</string>
+    <string name="logout_confirm_message_specific">Dette vil fjerne kontoen \"%s\" og dens legitimationsoplysninger fra denne enhed. Du kan logge ind igen når som helst.</string>
+    <string name="logout_confirm">Log ud</string>
+    <string name="logout_account">Log ud af %s</string>
+    <string name="switch_account">Skift konto</string>
+    <string name="no_accounts_connected">Ingen konti forbundet</string>
+    <string name="launch_with_account">Start med: %s</string>
+    <string name="select_account">Vælg konto</string>
 </resources>

@@ -7,6 +7,10 @@ import app.gamenative.data.GameSource
 import app.gamenative.data.PlatformAccount
 import app.gamenative.db.dao.GameAccountPreferenceDao
 import app.gamenative.db.dao.PlatformAccountDao
+import app.gamenative.db.dao.EpicGameDao
+import app.gamenative.db.dao.GOGGameDao
+import app.gamenative.db.dao.AmazonGameDao
+import app.gamenative.db.dao.SteamAppDao
 import app.gamenative.service.amazon.AmazonAuthManager
 import app.gamenative.service.epic.EpicAuthManager
 import app.gamenative.service.gog.GOGAuthManager
@@ -18,6 +22,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -39,6 +45,10 @@ import javax.inject.Singleton
 class AccountManager @Inject constructor(
     private val platformAccountDao: PlatformAccountDao,
     private val gameAccountPreferenceDao: GameAccountPreferenceDao,
+    private val epicGameDao: EpicGameDao,
+    private val gogGameDao: GOGGameDao,
+    private val amazonGameDao: AmazonGameDao,
+    private val steamAppDao: SteamAppDao,
 ) {
 
     private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
@@ -108,6 +118,7 @@ class AccountManager @Inject constructor(
 
     /**
      * Remove an account. If it was primary, promote the next available account.
+     * Also cleans up non-installed games owned by this account and unlinks installed ones.
      */
     suspend fun removeAccount(context: Context, platform: String, accountId: String) {
         val account = platformAccountDao.getByAccountId(platform, accountId)
@@ -117,6 +128,23 @@ class AccountManager @Inject constructor(
         }
 
         val wasPrimary = account.isPrimary
+
+        // Clean up games owned by this account
+        when (platform) {
+            "EPIC" -> {
+                epicGameDao.deleteNonInstalledByAccountId(accountId)
+                epicGameDao.unlinkInstalledByAccountId(accountId)
+            }
+            "GOG" -> {
+                gogGameDao.deleteNonInstalledByAccountId(accountId)
+                gogGameDao.unlinkInstalledByAccountId(accountId)
+            }
+            "AMAZON" -> {
+                amazonGameDao.deleteNonInstalledByAccountId(accountId)
+                amazonGameDao.unlinkInstalledByAccountId(accountId)
+            }
+        }
+        Timber.i("[AccountManager] Cleaned up games for $platform account: $accountId")
 
         // Delete credentials directory
         val accountsDir = getAccountsDir(context, platform, accountId)
@@ -207,6 +235,79 @@ class AccountManager @Inject constructor(
      */
     suspend fun clearGameAccount(gameId: String) {
         gameAccountPreferenceDao.deleteForGame(gameId)
+    }
+
+    /**
+     * Get accounts that own a specific game.
+     * Returns only accounts whose accountId matches the game's stored accountId.
+     * If the game has no accountId (legacy data), returns all accounts for the platform.
+     *
+     * @param appId The platform-specific game ID (e.g. "123" for Epic, "gog_456" for GOG)
+     */
+    suspend fun getAccountsThatOwnGame(platform: String, appId: String): List<PlatformAccount> {
+        val allPlatformAccounts = platformAccountDao.getByPlatform(platform)
+        if (allPlatformAccounts.size <= 1) return allPlatformAccounts
+
+        val ownerAccountIds: List<String>? = when (platform) {
+            "STEAM" -> {
+                val steamApp = steamAppDao.findApp(appId.toIntOrNull() ?: -1)
+                steamApp?.ownerAccountId?.map { it.toString() }?.ifEmpty { null }
+            }
+            "EPIC" -> {
+                epicGameDao.getAccountIdsForGame(appId.toIntOrNull() ?: -1).ifEmpty { null }
+            }
+            "GOG" -> {
+                gogGameDao.getAccountIdsForGame(appId).ifEmpty { null }
+            }
+            "AMAZON" -> {
+                amazonGameDao.getAccountIdsForGame(appId.toIntOrNull() ?: -1).ifEmpty { null }
+            }
+            else -> null
+        }
+
+        if (ownerAccountIds.isNullOrEmpty()) return allPlatformAccounts
+
+        val matchingAccounts = allPlatformAccounts.filter { it.accountId in ownerAccountIds }
+        return matchingAccounts.ifEmpty { allPlatformAccounts }
+    }
+
+    /**
+     * Reactive version of [getAccountsThatOwnGame].
+     * Emits a new filtered list whenever the underlying platform accounts change.
+     */
+    fun getAccountsThatOwnGameFlow(platform: String, appId: String): Flow<List<PlatformAccount>> {
+        return platformAccountDao.getByPlatformFlow(platform).flatMapLatest { allPlatformAccounts ->
+            flow {
+                if (allPlatformAccounts.size <= 1) {
+                    emit(allPlatformAccounts)
+                    return@flow
+                }
+
+                val ownerAccountIds: List<String>? = when (platform) {
+                    "STEAM" -> {
+                        val steamApp = steamAppDao.findApp(appId.toIntOrNull() ?: -1)
+                        steamApp?.ownerAccountId?.map { it.toString() }?.ifEmpty { null }
+                    }
+                    "EPIC" -> {
+                        epicGameDao.getAccountIdsForGame(appId.toIntOrNull() ?: -1).ifEmpty { null }
+                    }
+                    "GOG" -> {
+                        gogGameDao.getAccountIdsForGame(appId).ifEmpty { null }
+                    }
+                    "AMAZON" -> {
+                        amazonGameDao.getAccountIdsForGame(appId.toIntOrNull() ?: -1).ifEmpty { null }
+                    }
+                    else -> null
+                }
+
+                if (ownerAccountIds.isNullOrEmpty()) {
+                    emit(allPlatformAccounts)
+                } else {
+                    val matchingAccounts = allPlatformAccounts.filter { it.accountId in ownerAccountIds }
+                    emit(matchingAccounts.ifEmpty { allPlatformAccounts })
+                }
+            }
+        }
     }
 
     // ── Credential file management ──────────────────────────────────────────

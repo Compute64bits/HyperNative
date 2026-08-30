@@ -4,6 +4,7 @@ package app.gamenative.ui.screen.library
 
 import android.content.Intent
 import android.content.res.Configuration
+import app.gamenative.PluviaApp
 import app.gamenative.ui.screen.library.components.ambient.AmbientDownloadOverlay
 import android.content.ActivityNotFoundException
 import android.net.Uri
@@ -900,17 +901,6 @@ internal fun AppScreenContent(
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    // Account selector (if multiple accounts available)
-                    if (availableAccounts.size > 1) {
-                        AccountSelector(
-                            currentAccount = currentLaunchAccount,
-                            allAccounts = availableAccounts,
-                            onAccountSelected = onLaunchAccountSelected,
-                            modifier = Modifier.align(Alignment.End),
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-                    }
-
                     // Integrated action bar - overlaid on hero
                     val isPortrait = LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT
                     Column(
@@ -959,12 +949,18 @@ internal fun AppScreenContent(
                             )
                         }
 
+                        // Account selector next to play button — fills remaining space, truncates name
+                        AccountSelector(
+                            currentAccount = currentLaunchAccount,
+                            allAccounts = availableAccounts,
+                            onAccountSelected = onLaunchAccountSelected,
+                            modifier = Modifier.weight(1f),
+                        )
+
                         // Download size / ETA text — inline only in landscape
                         if (isDownloading && !isPortrait) {
                             Column(
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .padding(horizontal = 8.dp),
+                                modifier = Modifier.padding(horizontal = 8.dp),
                                 verticalArrangement = Arrangement.Center,
                             ) {
                                 if (downloadSizeText.isNotEmpty()) {
@@ -986,9 +982,8 @@ internal fun AppScreenContent(
                                     )
                                 }
                             }
-                        } else {
-                            Spacer(modifier = Modifier.weight(1f))
                         }
+                        // No spacer needed — AccountSelector.weight(1f) fills remaining space
 
                         // Secondary action icons (right-aligned)
                         ActionIconButton(
@@ -1285,6 +1280,13 @@ internal fun AppScreenContent(
         )
 
         // Ambient mode during downloads
+        DisposableEffect(isDownloading) {
+            PluviaApp.isAmbientDownloadActive = isDownloading
+            onDispose {
+                PluviaApp.isAmbientDownloadActive = false
+            }
+        }
+
         if (isDownloading) {
             AmbientDownloadOverlay(
                 gameName = displayInfo.name,

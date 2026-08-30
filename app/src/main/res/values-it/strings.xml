@@ -90,6 +90,14 @@
     <string name="confirm_delete">Conferma Eliminazione</string>
     <string name="destination_library">Libreria</string>
     <string name="destination_downloads">Download e archiviazione</string>
+    <string name="destination_discover">Scopri</string>
+    <string name="destination_my_games">I miei giochi</string>
+    <string name="destination_settings">Impostazioni</string>
+    <string name="settings_section_profile">Profilo</string>
+    <string name="settings_section_accounts">Account</string>
+    <string name="settings_section_library_options">Opzioni libreria</string>
+
+
     <string name="downloads_section_title">Download</string>
 
     <string name="downloads_empty">Nessun download attivo</string>
@@ -2327,4 +2335,23 @@
     <string name="favorite_added">Aggiunto ai preferiti</string>
     <string name="favorite_added_named">%1$s aggiunto ai preferiti</string>
     <string name="xr_refresh_rate">Frequenza di aggiornamento VR</string>
+    <string name="accounts_steam">Account Steam</string>
+    <string name="accounts_gog">Account GOG</string>
+    <string name="accounts_epic">Account Epic</string>
+    <string name="accounts_amazon">Account Amazon Games</string>
+    <string name="add_account">Aggiungi account</string>
+    <string name="remove_account">Rimuovi account</string>
+    <string name="remove_account_confirmation">Rimuovere «%s» dai tuoi account?</string>
+    <string name="set_as_primary">Imposta come principale</string>
+    <string name="primary_account">Principale</string>
+    <string name="logout">Esci</string>
+    <string name="logout_confirm_title">Uscire?</string>
+    <string name="logout_confirm_message">Questo rimuoverà le tue credenziali e cancellerà la tua libreria da questo dispositivo. Puoi accedere di nuovo in qualsiasi momento.</string>
+    <string name="logout_confirm_message_specific">Questo rimuoverà l\'account \"%s\" e le sue credenziali da questo dispositivo. Puoi accedere di nuovo in qualsiasi momento.</string>
+    <string name="logout_confirm">Esci</string>
+    <string name="logout_account">Esci da %s</string>
+    <string name="switch_account">Cambia account</string>
+    <string name="no_accounts_connected">Nessun account connesso</string>
+    <string name="launch_with_account">Avvia con: %s</string>
+    <string name="select_account">Seleziona account</string>
 </resources>

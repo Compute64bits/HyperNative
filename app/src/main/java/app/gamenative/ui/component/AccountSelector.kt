@@ -4,9 +4,11 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.StarOutline
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -29,7 +31,8 @@ import app.gamenative.R
 import app.gamenative.data.PlatformAccount
 
 /**
- * A compact account selector that shows the current account and allows switching.
+ * A compact account display that shows the current account name.
+ * When multiple accounts are available, it becomes a clickable dropdown to switch accounts.
  * Designed to be placed near the play button in the game detail screen.
  */
 @Composable
@@ -39,14 +42,10 @@ fun AccountSelector(
     onAccountSelected: (PlatformAccount) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    if (allAccounts.size <= 1) return // No need to show selector if only one account
-
+    val hasMultipleAccounts = allAccounts.size > 1
     var expanded by remember { mutableStateOf(false) }
 
-    TextButton(
-        onClick = { expanded = true },
-        modifier = modifier,
-    ) {
+    val content: @Composable () -> Unit = {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(
                 imageVector = Icons.Default.Person,
@@ -61,6 +60,7 @@ fun AccountSelector(
                 color = Color.White.copy(alpha = 0.8f),
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.widthIn(max = 120.dp),
             )
             if (currentAccount?.isPrimary == true) {
                 Spacer(modifier = Modifier.width(4.dp))
@@ -71,6 +71,15 @@ fun AccountSelector(
                     tint = MaterialTheme.colorScheme.primary,
                 )
             }
+        }
+    }
+
+    if (hasMultipleAccounts) {
+        TextButton(
+            onClick = { expanded = true },
+            modifier = modifier,
+        ) {
+            content()
         }
 
         DropdownMenu(
@@ -90,15 +99,6 @@ fun AccountSelector(
                                 },
                                 maxLines = 1,
                             )
-                            if (account.isPrimary) {
-                                Spacer(modifier = Modifier.width(4.dp))
-                                Icon(
-                                    imageVector = Icons.Default.Star,
-                                    contentDescription = stringResource(R.string.primary_account),
-                                    modifier = Modifier.size(14.dp),
-                                    tint = MaterialTheme.colorScheme.primary,
-                                )
-                            }
                         }
                     },
                     onClick = {
@@ -112,8 +112,32 @@ fun AccountSelector(
                             modifier = Modifier.size(20.dp),
                         )
                     },
+                    trailingIcon = {
+                        Icon(
+                            imageVector = if (account.isPrimary) Icons.Default.Star else Icons.Default.StarOutline,
+                            contentDescription = if (account.isPrimary) {
+                                stringResource(R.string.primary_account)
+                            } else {
+                                null
+                            },
+                            modifier = Modifier.size(16.dp),
+                            tint = if (account.isPrimary) {
+                                MaterialTheme.colorScheme.primary
+                            } else {
+                                MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f)
+                            },
+                        )
+                    },
                 )
             }
+        }
+    } else {
+        // Single account — display name only, not clickable
+        Row(
+            modifier = modifier,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            content()
         }
     }
 }

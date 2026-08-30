@@ -100,6 +100,10 @@ data class AmazonGame(
     /** Raw product JSON kept for manifest lookup, etc. */
     @ColumnInfo("product_json")
     val productJson: String = "",
+
+    /** Platform account ID that owns this game (empty = unknown/legacy) */
+    @ColumnInfo(name = "account_id", defaultValue = "")
+    val accountId: String = "",
 )
 
 /**

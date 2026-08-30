@@ -89,6 +89,14 @@
     <string name="confirm_delete">確認刪除</string>
     <string name="destination_library">遊戲庫</string>
     <string name="destination_downloads">下載與儲存</string>
+    <string name="destination_discover">探索</string>
+    <string name="destination_my_games">我的遊戲</string>
+    <string name="destination_settings">設定</string>
+    <string name="settings_section_profile">個人檔案</string>
+    <string name="settings_section_accounts">帳戶</string>
+    <string name="settings_section_library_options">遊戲庫選項</string>
+
+
     <string name="downloads_section_title">下載</string>
 
     <!-- Library Tabs -->
@@ -2342,4 +2350,23 @@
     <string name="favorite_added">已加入收藏</string>
     <string name="favorite_added_named">已將 %1$s 加入收藏</string>
     <string name="xr_refresh_rate">VR 重新整理頻率</string>
+    <string name="accounts_steam">Steam 帳戶</string>
+    <string name="accounts_gog">GOG 帳戶</string>
+    <string name="accounts_epic">Epic 帳戶</string>
+    <string name="accounts_amazon">Amazon Games 帳戶</string>
+    <string name="add_account">新增帳戶</string>
+    <string name="remove_account">移除帳戶</string>
+    <string name="remove_account_confirmation">從您的帳戶中移除「%s」？</string>
+    <string name="set_as_primary">設為主要帳戶</string>
+    <string name="primary_account">主要</string>
+    <string name="logout">登出</string>
+    <string name="logout_confirm_title">登出？</string>
+    <string name="logout_confirm_message">這將移除您的憑證並清除此裝置上的資料庫。您可以隨時重新登入。</string>
+    <string name="logout_confirm_message_specific">這將從此裝置中移除帳戶\"%s\"及其憑證。您可以隨時重新登入。</string>
+    <string name="logout_confirm">登出</string>
+    <string name="logout_account">登出 %s</string>
+    <string name="switch_account">切換帳戶</string>
+    <string name="no_accounts_connected">未連接任何帳戶</string>
+    <string name="launch_with_account">使用以下啟動：%s</string>
+    <string name="select_account">選擇帳戶</string>
 </resources>

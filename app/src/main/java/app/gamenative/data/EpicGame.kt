@@ -126,6 +126,10 @@ data class EpicGame(
 
     @ColumnInfo("eos_app_id")
     val eosAppId: String = "",
+
+    /** Platform account ID that owns this game (empty = unknown/legacy) */
+    @ColumnInfo(name = "account_id", defaultValue = "")
+    val accountId: String = "",
 ) {
     /**
      * Primary image URL for the game

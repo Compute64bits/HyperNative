@@ -26,10 +26,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -72,10 +70,8 @@ fun LibraryTabBar(
     currentTab: LibraryTab,
     tabCounts: Map<LibraryTab, Int>,
     onTabSelected: (LibraryTab) -> Unit,
-    onOptionsClick: () -> Unit,
     onSearchClick: () -> Unit,
     onAddGameClick: () -> Unit,
-    onMenuClick: () -> Unit,
     onNavigateDownToGrid: () -> Unit,
     onPreviousTab: () -> Unit = {},
     onNextTab: () -> Unit = {},
@@ -88,10 +84,8 @@ fun LibraryTabBar(
             currentTab = currentTab,
             tabCounts = tabCounts,
             onTabSelected = onTabSelected,
-            onOptionsClick = onOptionsClick,
             onSearchClick = onSearchClick,
             onAddGameClick = onAddGameClick,
-            onMenuClick = onMenuClick,
             onNavigateDownToGrid = onNavigateDownToGrid,
             onPreviousTab = onPreviousTab,
             onNextTab = onNextTab,
@@ -102,10 +96,8 @@ fun LibraryTabBar(
             currentTab = currentTab,
             tabCounts = tabCounts,
             onTabSelected = onTabSelected,
-            onOptionsClick = onOptionsClick,
             onSearchClick = onSearchClick,
             onAddGameClick = onAddGameClick,
-            onMenuClick = onMenuClick,
             onNavigateDownToGrid = onNavigateDownToGrid,
             onPreviousTab = onPreviousTab,
             onNextTab = onNextTab,
@@ -123,10 +115,8 @@ private fun CompactLibraryTabBar(
     currentTab: LibraryTab,
     tabCounts: Map<LibraryTab, Int>,
     onTabSelected: (LibraryTab) -> Unit,
-    onOptionsClick: () -> Unit,
     onSearchClick: () -> Unit,
     onAddGameClick: () -> Unit,
-    onMenuClick: () -> Unit,
     onNavigateDownToGrid: () -> Unit,
     onPreviousTab: () -> Unit,
     onNextTab: () -> Unit,
@@ -188,12 +178,6 @@ private fun CompactLibraryTabBar(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(4.dp),
         ) {
-            CompactIconButton(
-                icon = Icons.Default.Tune,
-                contentDescription = stringResource(R.string.options),
-                onClick = onOptionsClick,
-            )
-
             Row(
                 modifier = Modifier
                     .weight(1f)
@@ -286,11 +270,6 @@ private fun CompactLibraryTabBar(
                 contentDescription = stringResource(R.string.action_add_game),
                 onClick = onAddGameClick,
             )
-            CompactIconButton(
-                icon = Icons.Default.Menu,
-                contentDescription = stringResource(R.string.menu),
-                onClick = onMenuClick,
-            )
         }
     }
 }
@@ -349,10 +328,8 @@ private fun ExpandedLibraryTabBar(
     currentTab: LibraryTab,
     tabCounts: Map<LibraryTab, Int>,
     onTabSelected: (LibraryTab) -> Unit,
-    onOptionsClick: () -> Unit,
     onSearchClick: () -> Unit,
     onAddGameClick: () -> Unit,
-    onMenuClick: () -> Unit,
     onNavigateDownToGrid: () -> Unit,
     onPreviousTab: () -> Unit,
     onNextTab: () -> Unit,
@@ -435,12 +412,6 @@ private fun ExpandedLibraryTabBar(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            IconActionButton(
-                icon = Icons.Default.Tune,
-                contentDescription = stringResource(R.string.options),
-                onClick = onOptionsClick,
-            )
-
             Box(
                 modifier = Modifier
                     .weight(1f)
@@ -504,12 +475,6 @@ private fun ExpandedLibraryTabBar(
                 icon = Icons.Default.Add,
                 contentDescription = stringResource(R.string.action_add_game),
                 onClick = onAddGameClick,
-            )
-
-            IconActionButton(
-                icon = Icons.Default.Menu,
-                contentDescription = stringResource(R.string.menu),
-                onClick = onMenuClick,
             )
         }
     }
@@ -704,10 +669,8 @@ private fun Preview_LibraryTabBar() {
                     LibraryTab.LOCAL to 3,
                 ),
                 onTabSelected = {},
-                onOptionsClick = {},
                 onSearchClick = {},
                 onAddGameClick = {},
-                onMenuClick = {},
                 onNavigateDownToGrid = {},
             )
         }
@@ -733,10 +696,8 @@ private fun Preview_LibraryTabBar_Steam() {
                     LibraryTab.LOCAL to 3,
                 ),
                 onTabSelected = {},
-                onOptionsClick = {},
                 onSearchClick = {},
                 onAddGameClick = {},
-                onMenuClick = {},
                 onNavigateDownToGrid = {},
             )
         }

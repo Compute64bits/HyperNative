@@ -89,6 +89,14 @@
     <string name="confirm_delete">确认删除</string>
     <string name="destination_library">游戏库</string>
     <string name="destination_downloads">下载和存储</string>
+    <string name="destination_discover">发现</string>
+    <string name="destination_my_games">我的游戏</string>
+    <string name="destination_settings">设置</string>
+    <string name="settings_section_profile">个人资料</string>
+    <string name="settings_section_accounts">账户</string>
+    <string name="settings_section_library_options">库选项</string>
+
+
     <string name="downloads_section_title">下载</string>
 
     <!-- Library Tabs -->
@@ -2351,4 +2359,23 @@
     <string name="favorite_added">已添加到收藏</string>
     <string name="favorite_added_named">已将 %1$s 添加到收藏</string>
     <string name="xr_refresh_rate">VR 刷新率</string>
+    <string name="accounts_steam">Steam 账户</string>
+    <string name="accounts_gog">GOG 账户</string>
+    <string name="accounts_epic">Epic 账户</string>
+    <string name="accounts_amazon">Amazon Games 账户</string>
+    <string name="add_account">添加账户</string>
+    <string name="remove_account">移除账户</string>
+    <string name="remove_account_confirmation">从您的账户中移除「%s」？</string>
+    <string name="set_as_primary">设为主账户</string>
+    <string name="primary_account">主账户</string>
+    <string name="logout">退出登录</string>
+    <string name="logout_confirm_title">退出登录？</string>
+    <string name="logout_confirm_message">这将移除您的凭据并清除此设备上的资料库。您可以随时重新登录。</string>
+    <string name="logout_confirm_message_specific">这将从此设备中移除帐户\"%s\"及其凭据。您可以随时重新登录。</string>
+    <string name="logout_confirm">退出登录</string>
+    <string name="logout_account">退出 %s</string>
+    <string name="switch_account">切换账户</string>
+    <string name="no_accounts_connected">未连接任何账户</string>
+    <string name="launch_with_account">使用以下启动：%s</string>
+    <string name="select_account">选择账户</string>
 </resources>

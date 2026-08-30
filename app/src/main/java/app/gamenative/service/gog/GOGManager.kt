@@ -165,6 +165,9 @@ class GOGManager @Inject constructor(
                 return@withContext Result.failure(Exception("Not authenticated with GOG"))
             }
 
+            val gogCredentials = GOGAuthManager.getStoredCredentials(context).getOrNull()
+            val gogAccountId = gogCredentials?.userId ?: ""
+
             Timber.tag("GOG").i("Refreshing GOG library from GOG API...")
 
             // Fetch games from GOG via GOGDL Python backend
@@ -223,9 +226,12 @@ class GOGManager @Inject constructor(
                                 // Only real (non-excluded) games are shown, so only fetch
                                 // their portrait cover to avoid wasting GamesDB requests.
                                 val game = if (parsedGame.exclude) {
-                                    parsedGame
+                                    parsedGame.copy(accountId = gogAccountId)
                                 } else {
-                                    parsedGame.copy(verticalCoverUrl = GOGApiClient.getVerticalCoverUrl(id))
+                                    parsedGame.copy(
+                                        verticalCoverUrl = GOGApiClient.getVerticalCoverUrl(id),
+                                        accountId = gogAccountId,
+                                    )
                                 }
                                 games.add(game)
                                 Timber.tag("GOG").d("Refreshed Game: ${game.title}")

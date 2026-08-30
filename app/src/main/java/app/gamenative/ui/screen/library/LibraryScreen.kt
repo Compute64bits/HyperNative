@@ -53,7 +53,6 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.foundation.focusGroup
@@ -102,8 +101,6 @@ import app.gamenative.ui.screen.library.components.LibraryCarouselPane
 import app.gamenative.ui.screen.library.components.LibraryDetailPane
 import app.gamenative.ui.screen.library.components.LibraryListPane
 import app.gamenative.ui.screen.library.components.LibraryFavoritesEmptyState
-import app.gamenative.ui.screen.library.components.RecommendationDisclosureDialog
-import app.gamenative.ui.screen.library.components.LibraryOptionsPanel
 import app.gamenative.ui.screen.library.components.LibrarySearchBar
 import app.gamenative.ui.screen.library.components.LibrarySourceNotLoggedInSplash
 import app.gamenative.ui.screen.library.components.LibraryTabBar
@@ -111,17 +108,13 @@ import app.gamenative.ui.screen.library.components.toggleFavorite
 import app.gamenative.ui.screen.auth.AmazonOAuthActivity
 import app.gamenative.ui.screen.auth.EpicOAuthActivity
 import app.gamenative.ui.screen.auth.GOGOAuthActivity
-import app.gamenative.ui.screen.library.components.SystemMenu
 import app.gamenative.ui.theme.PluviaTheme
-import app.gamenative.ui.util.PlatformAuthUiHelpers
-import app.gamenative.ui.util.PlatformLogoutCallbacks
-import app.gamenative.service.amazon.AmazonService
-import app.gamenative.service.epic.EpicService
-import app.gamenative.service.gog.GOGService
 import app.gamenative.utils.CustomGameScanner
 import app.gamenative.utils.PlatformOAuthHandlers
 import app.gamenative.utils.SteamUtils
-import app.gamenative.ui.component.dialog.AccountsDialog
+import app.gamenative.service.amazon.AmazonService
+import app.gamenative.service.epic.EpicService
+import app.gamenative.service.gog.GOGService
 import kotlinx.coroutines.launch
 import android.os.SystemClock
 
@@ -138,6 +131,9 @@ fun HomeLibraryScreen(
     onDownloadsClick: () -> Unit = {},
     isOffline: Boolean = false,
     isSteamConnected: Boolean = false,
+    onGogLoginClick: () -> Unit = {},
+    onEpicLoginClick: () -> Unit = {},
+    onAmazonLoginClick: () -> Unit = {},
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val importState by viewModel.importState.collectAsStateWithLifecycle()
@@ -167,12 +163,14 @@ fun HomeLibraryScreen(
         onSortOptionChanged = viewModel::onSortOptionChanged,
         onSteamCollectionToggle = viewModel::onSteamCollectionToggle,
         onClearSteamCollections = viewModel::onClearSteamCollections,
-        onOptionsPanelToggle = viewModel::onOptionsPanelToggle,
         onTabChanged = viewModel::onTabChanged,
         onPreviousTab = viewModel::onPreviousTab,
         onNextTab = viewModel::onNextTab,
         isOffline = isOffline,
         isSteamConnected = isSteamConnected,
+        onGogLoginClick = onGogLoginClick,
+        onEpicLoginClick = onEpicLoginClick,
+        onAmazonLoginClick = onAmazonLoginClick,
     )
 }
 
@@ -210,12 +208,14 @@ private fun LibraryScreenContent(
     onSortOptionChanged: (SortOption) -> Unit,
     onSteamCollectionToggle: (String) -> Unit,
     onClearSteamCollections: () -> Unit,
-    onOptionsPanelToggle: (Boolean) -> Unit,
     onTabChanged: (LibraryTab) -> Unit,
     onPreviousTab: () -> Unit,
     onNextTab: () -> Unit,
     isOffline: Boolean = false,
     isSteamConnected: Boolean = false,
+    onGogLoginClick: () -> Unit = {},
+    onEpicLoginClick: () -> Unit = {},
+    onAmazonLoginClick: () -> Unit = {},
 ) {
     val context = LocalContext.current
     val lifecycleScope = LocalLifecycleOwner.current.lifecycleScope
@@ -329,12 +329,6 @@ private fun LibraryScreenContent(
     val carouselListState = rememberLazyListState()
     val isViewWide = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
     var currentPaneType by remember { mutableStateOf(PrefManager.libraryLayout) }
-    var recDisclosureShown by remember { mutableStateOf(PrefManager.recDisclosureShown) }
-    var showRecTeaserDialog by remember { mutableStateOf(false) }
-    val onRecTeaserTapped = {
-        showRecTeaserDialog = true
-    }
-    val recTeaserVisible = state.appInfoList.firstOrNull()?.isRecTeaser == true
 
     // Initialize layout if undecided
     LaunchedEffect(Unit) {
@@ -352,11 +346,7 @@ private fun LibraryScreenContent(
     var pendingGridFocusRequest by remember { mutableStateOf(false) }
     var pendingCarouselFocusRequest by remember { mutableStateOf(false) }
 
-    var recommendationItemCount by remember { mutableIntStateOf(0) }
-
-    var isSystemMenuOpen by remember { mutableStateOf(false) }
     // Track previous overlay states to detect when they close
-    var wasSystemMenuOpen by remember { mutableStateOf(false) }
     var wasOptionsPanelOpen by remember { mutableStateOf(false) }
     // Keep a stable reference to the selected item so detail view doesn't disappear during list refresh/pagination.
     var selectedLibraryItem by remember { mutableStateOf<LibraryItem?>(null) }
@@ -385,11 +375,7 @@ private fun LibraryScreenContent(
     var lastBootstrapAtMs by remember { mutableLongStateOf(0L) }
 
     fun getContentLastIndex(): Int {
-        return if (state.currentTab == LibraryTab.RECOMMENDED) {
-            (recommendationItemCount - 1).coerceAtLeast(0)
-        } else {
-            state.appInfoList.lastIndex.coerceAtLeast(0)
-        }
+        return state.appInfoList.lastIndex.coerceAtLeast(0)
     }
 
     fun firstVisibleContentIndex(): Int {
@@ -423,7 +409,7 @@ private fun LibraryScreenContent(
     }
 
     // Moved all state.appInfoList.isNotEmpty() checking to this function
-    fun isListFocusable(): Boolean = state.appInfoList.isNotEmpty() || state.currentTab == LibraryTab.RECOMMENDED
+    fun isListFocusable(): Boolean = state.appInfoList.isNotEmpty()
 
     fun requestGridFocusOrDefer() {
         if (!isListFocusable()) return
@@ -468,7 +454,6 @@ private fun LibraryScreenContent(
     }
 
     fun focusedLibraryItem(): LibraryItem? {
-        if (state.currentTab == LibraryTab.RECOMMENDED) return null
         val focusedIndex = if (currentPaneType == PaneType.CAROUSEL) {
             currentCarouselFocusTargetIndex()
         } else {
@@ -534,12 +519,8 @@ private fun LibraryScreenContent(
         }
     }
 
-    BackHandler(enabled = isSystemMenuOpen) {
-        isSystemMenuOpen = false
-    }
-
     BackHandler(enabled = state.isOptionsPanelOpen) {
-        onOptionsPanelToggle(false)
+        // Options panel is no longer shown in library
     }
 
     BackHandler(enabled = state.isSearching && selectedAppId == null) {
@@ -615,12 +596,12 @@ private fun LibraryScreenContent(
         gridFocusTargetListIndex,
         state.appInfoList.size,
         selectedAppId,
-        isSystemMenuOpen,
+        false,
         state.isOptionsPanelOpen,
         state.isSearching,
     ) {
         if (pendingGridFocusRequest && isListFocusable()) {
-            if (selectedAppId == null && !isSystemMenuOpen && !state.isOptionsPanelOpen && !state.isSearching) {
+            if (selectedAppId == null && !false && !state.isOptionsPanelOpen && !state.isSearching) {
                 var retries = 0
                 while (pendingGridFocusRequest && retries < 8) {
                     try {
@@ -641,12 +622,12 @@ private fun LibraryScreenContent(
         carouselFocusTargetListIndex,
         state.appInfoList.size,
         selectedAppId,
-        isSystemMenuOpen,
+        false,
         state.isOptionsPanelOpen,
         state.isSearching,
     ) {
         if (pendingCarouselFocusRequest && isListFocusable()) {
-            if (selectedAppId == null && !isSystemMenuOpen && !state.isOptionsPanelOpen && !state.isSearching) {
+            if (selectedAppId == null && !false && !state.isOptionsPanelOpen && !state.isSearching) {
                 val targetIndex = currentCarouselFocusTargetIndex()
                 if (carouselListState.layoutInfo.visibleItemsInfo.none { it.index == targetIndex }) {
                     carouselListState.scrollToItem(targetIndex)
@@ -669,7 +650,7 @@ private fun LibraryScreenContent(
     LaunchedEffect(
         state.appInfoList.size,
         selectedAppId,
-        isSystemMenuOpen,
+        false,
         state.isOptionsPanelOpen,
         state.isSearching,
     ) {
@@ -677,10 +658,10 @@ private fun LibraryScreenContent(
         val listBecameNonEmpty = previousAppCount == 0 && currentCount > 0
         val listBecameEmpty = previousAppCount > 0 && currentCount == 0
 
-        if (listBecameNonEmpty && selectedAppId == null && !isSystemMenuOpen && !state.isOptionsPanelOpen && !state.isSearching && !tabBarHasFocus) {
+        if (listBecameNonEmpty && selectedAppId == null && !false && !state.isOptionsPanelOpen && !state.isSearching && !tabBarHasFocus) {
             requestContentFocusOrDefer()
         }
-        if (listBecameEmpty && selectedAppId == null && !isSystemMenuOpen && !state.isOptionsPanelOpen && !state.isSearching && !tabBarHasFocus) {
+        if (listBecameEmpty && selectedAppId == null && !false && !state.isOptionsPanelOpen && !state.isSearching && !tabBarHasFocus) {
             // Empty tabs can drop focused children; re-anchor focus at the root so bumper nav keeps working.
             requestRootFocusSafe()
         }
@@ -688,25 +669,19 @@ private fun LibraryScreenContent(
         previousAppCount = currentCount
     }
 
-    // Restore focus when System Menu or Options Panel closes
-    LaunchedEffect(isSystemMenuOpen, state.isOptionsPanelOpen) {
-        val systemMenuJustClosed = wasSystemMenuOpen && !isSystemMenuOpen
+    // Restore focus when Options Panel closes
+    LaunchedEffect(state.isOptionsPanelOpen) {
         val optionsPanelJustClosed = wasOptionsPanelOpen && !state.isOptionsPanelOpen
 
-        if ((systemMenuJustClosed || optionsPanelJustClosed) && !state.isSearching) {
-            // Give a brief moment for the overlay to animate out
+        if (optionsPanelJustClosed && !state.isSearching) {
             kotlinx.coroutines.delay(50)
-            // Restore focus to the active content layout
             if (isListFocusable()) {
                 requestContentFocusOrDefer()
             } else {
-                // Empty list - focus root so bumpers still work
                 requestRootFocusSafe()
             }
         }
 
-        // Update previous state trackers
-        wasSystemMenuOpen = isSystemMenuOpen
         wasOptionsPanelOpen = state.isOptionsPanelOpen
     }
 
@@ -716,7 +691,7 @@ private fun LibraryScreenContent(
     val canBootstrapContentFocus: () -> Boolean = {
         val now = SystemClock.uptimeMillis()
         selectedAppId == null &&
-            !isSystemMenuOpen &&
+            !false &&
             !state.isOptionsPanelOpen &&
             !state.isSearching &&
             isListFocusable() &&
@@ -727,7 +702,7 @@ private fun LibraryScreenContent(
     }
     val canNavigateTabsWithoutFocus: () -> Boolean = {
         selectedAppId == null &&
-            !isSystemMenuOpen &&
+            !false &&
             !state.isOptionsPanelOpen &&
             !state.isSearching &&
             !rootHasFocus
@@ -839,7 +814,7 @@ private fun LibraryScreenContent(
                     val keyCode = keyEvent.nativeKeyEvent.keyCode
                     val canBootstrapContentFocus = selectedAppId == null &&
                         !state.isOptionsPanelOpen &&
-                        !isSystemMenuOpen &&
+                        !false &&
                         !state.isSearching &&
                         isListFocusable() &&
                         controllerBootstrapNeeded &&
@@ -868,7 +843,7 @@ private fun LibraryScreenContent(
 
                         // L1 button - previous tab
                         KeyEvent.KEYCODE_BUTTON_L1 -> {
-                            if (selectedAppId == null && !state.isOptionsPanelOpen && !isSystemMenuOpen) {
+                            if (selectedAppId == null && !state.isOptionsPanelOpen && !false) {
                                 if (canBootstrapContentFocus) {
                                     requestContentFocusOrDefer()
                                 }
@@ -881,7 +856,7 @@ private fun LibraryScreenContent(
 
                         // R1 button - next tab
                         KeyEvent.KEYCODE_BUTTON_R1 -> {
-                            if (selectedAppId == null && !state.isOptionsPanelOpen && !isSystemMenuOpen) {
+                            if (selectedAppId == null && !state.isOptionsPanelOpen && !false) {
                                 if (canBootstrapContentFocus) {
                                     requestContentFocusOrDefer()
                                 }
@@ -892,31 +867,21 @@ private fun LibraryScreenContent(
                             }
                         }
 
-                        // SELECT button - toggle options panel (library filters/sort)
+                        // SELECT button - no options panel
                         KeyEvent.KEYCODE_BUTTON_SELECT -> {
-                            if (selectedAppId == null && !isSystemMenuOpen) {
-                                onOptionsPanelToggle(!state.isOptionsPanelOpen)
-                                true
-                            } else {
-                                false
-                            }
+                            false
                         }
 
-                        // START button - toggle system menu (profile/settings)
+                        // START button - no system menu
                         KeyEvent.KEYCODE_BUTTON_START,
                         KeyEvent.KEYCODE_MENU,
                         -> {
-                            if (selectedAppId == null && !state.isOptionsPanelOpen) {
-                                isSystemMenuOpen = !isSystemMenuOpen
-                                true
-                            } else {
-                                false
-                            }
+                            false
                         }
 
                         // Y button - toggle search
                         KeyEvent.KEYCODE_BUTTON_Y -> {
-                            if (selectedAppId == null && !state.isOptionsPanelOpen && !isSystemMenuOpen) {
+                            if (selectedAppId == null && !state.isOptionsPanelOpen && !false) {
                                 onIsSearching(!state.isSearching)
                                 true
                             } else {
@@ -929,7 +894,7 @@ private fun LibraryScreenContent(
                             if (selectedAppId == null &&
                                 !state.isSearching &&
                                 !state.isOptionsPanelOpen &&
-                                !isSystemMenuOpen &&
+                                !false &&
                                 !tabBarHasFocus
                             ) {
                                 toggleFocusedFavorite()
@@ -938,25 +903,16 @@ private fun LibraryScreenContent(
                             }
                         }
 
-                        // B button - contextual back / open system menu
+                        // B button - contextual back
                         KeyEvent.KEYCODE_BUTTON_B -> {
                             if (selectedAppId != null) {
-                                // Let LibraryAppScreen handle its own B-button
                                 false
-                            } else if (isSystemMenuOpen) {
-                                isSystemMenuOpen = false
-                                true
-                            } else if (state.isOptionsPanelOpen) {
-                                onOptionsPanelToggle(false)
-                                true
                             } else if (state.isSearching) {
                                 onIsSearching(false)
                                 onSearchQuery("")
                                 true
                             } else {
-                                // Root library view: open system menu
-                                isSystemMenuOpen = true
-                                true
+                                false
                             }
                         }
 
@@ -970,49 +926,7 @@ private fun LibraryScreenContent(
         if (selectedAppId == null) {
             // Use Box to allow content to scroll behind the tab bar
             Box(modifier = Modifier.fillMaxSize()) {
-                if (showRecTeaserDialog) {
-                    RecommendationDisclosureDialog(
-                        onContinue = {
-                            PrefManager.recDisclosureShown = true
-                            recDisclosureShown = true
-                            showRecTeaserDialog = false
-                            PluviaApp.events.emit(AndroidEvent.RecommendationToggleChanged)
-                        },
-                        onDismiss = {
-                            PrefManager.recTeaserDismissedDay = System.currentTimeMillis() / (24L * 60 * 60 * 1000)
-                            showRecTeaserDialog = false
-                        },
-                        source = "hero",
-                    )
-                }
                 // When on Steam/GOG/Epic/Amazon tab and not logged in, or LOCAL tab with no custom games, show splash
-                if (state.currentTab == LibraryTab.RECOMMENDED) {
-                    if (recDisclosureShown) {
-                        RecommendedTabPane(
-                            currentPaneType = currentPaneType,
-                            onNavigate = { item ->
-                                selectedAppId = item.appId
-                                selectedLibraryItem = item
-                            },
-                            modifier = Modifier.fillMaxSize(),
-                            firstCarouselItemFocusRequester = carouselFocusRequester,
-                            firstGridItemFocusRequester = gridFirstItemFocusRequester,
-                            focusTargetListIndex = if (currentPaneType == PaneType.CAROUSEL) currentCarouselFocusTargetIndex() else gridFocusTargetListIndex,
-                            onFocusedIndexChanged = { carouselFocusTargetListIndex = it },
-                            onItemCountChanged = { recommendationItemCount = it },
-                        )
-                    } else {
-                        Box(modifier = Modifier.fillMaxSize())
-                        RecommendationDisclosureDialog(
-                            onContinue = {
-                                PrefManager.recDisclosureShown = true
-                                recDisclosureShown = true
-                                PluviaApp.events.emit(AndroidEvent.RecommendationToggleChanged)
-                            },
-                            onDismiss = { onTabChanged(LibraryTab.ALL) },
-                        )
-                    }
-                } else {
                 val showEmptyStateSplash = when (state.currentTab) {
                     LibraryTab.STEAM -> !SteamUtils.hasStoredCredentials() && !state.isLoading
                     LibraryTab.GOG -> !GOGService.hasStoredCredentials(context)
@@ -1088,14 +1002,8 @@ private fun LibraryScreenContent(
                             onPageChange = onPageChange,
                             onNavigate = { appId ->
                                 val item = state.appInfoList.find { it.appId == appId }
-                                if (item?.isRecTeaser == true) {
-                                    if (!item.isRecLoading && !recDisclosureShown) {
-                                        onRecTeaserTapped()
-                                    }
-                                } else {
-                                    selectedAppId = appId
-                                    selectedLibraryItem = item
-                                }
+                                selectedAppId = appId
+                                selectedLibraryItem = item
                             },
                             onRefresh = onRefresh,
                             modifier = Modifier.fillMaxSize(),
@@ -1113,21 +1021,14 @@ private fun LibraryScreenContent(
                             onPageChange = onPageChange,
                             onNavigate = { appId ->
                                 val item = state.appInfoList.find { it.appId == appId }
-                                if (item?.isRecTeaser == true) {
-                                    if (!item.isRecLoading && !recDisclosureShown) {
-                                        onRecTeaserTapped()
-                                    }
-                                } else {
-                                    selectedAppId = appId
-                                    selectedLibraryItem = item
-                                }
+                                selectedAppId = appId
+                                selectedLibraryItem = item
                             },
                             onRefresh = onRefresh,
                             modifier = Modifier.fillMaxSize(),
                             onFocusedIndexChanged = { gridFocusTargetListIndex = it },
                         )
                     }
-                }
                 }
 
                 // Top overlay: Tab bar OR Search bar
@@ -1166,10 +1067,8 @@ private fun LibraryScreenContent(
                             LibraryTab.LOCAL to state.localCount,
                         ),
                         onTabSelected = onTabChanged,
-                        onOptionsClick = { onOptionsPanelToggle(true) },
                         onSearchClick = { onIsSearching(true) },
                         onAddGameClick = onAddCustomGameClick,
-                        onMenuClick = { isSystemMenuOpen = true },
                         onNavigateDownToGrid = {
                             if (isListFocusable()) {
                                 requestContentFocusOrDefer()
@@ -1218,7 +1117,7 @@ private fun LibraryScreenContent(
         }
 
         // Bottom action bar
-        if (selectedAppId == null && !state.isOptionsPanelOpen && !isSystemMenuOpen) {
+        if (selectedAppId == null && !state.isOptionsPanelOpen && !false) {
             val libraryActions = if (state.isSearching) {
                 listOf(
                     LibraryActions.select,
@@ -1234,21 +1133,6 @@ private fun LibraryScreenContent(
             } else {
                 listOf(
                     LibraryActions.select,
-                    GamepadAction(
-                        button = GamepadButton.SELECT,
-                        labelResId = R.string.options,
-                        onClick = { onOptionsPanelToggle(true) },
-                    ),
-                    GamepadAction(
-                        button = GamepadButton.START,
-                        labelResId = R.string.action_system,
-                        onClick = { isSystemMenuOpen = true },
-                    ),
-                    GamepadAction(
-                        button = GamepadButton.B,
-                        labelResId = R.string.menu,
-                        onClick = { isSystemMenuOpen = true },
-                    ),
                     GamepadAction(
                         button = GamepadButton.Y,
                         labelResId = R.string.search,
@@ -1274,135 +1158,6 @@ private fun LibraryScreenContent(
                 modifier = Modifier.align(Alignment.BottomCenter),
                 visible = true,
             )
-        }
-
-        // Options panel (SELECT) - renders on top of everything
-        if (selectedAppId == null) {
-            LibraryOptionsPanel(
-                isOpen = state.isOptionsPanelOpen,
-                onDismiss = { onOptionsPanelToggle(false) },
-                selectedFilters = state.appInfoSortType,
-                onFilterChanged = onFilterChanged,
-                currentSortOption = state.currentSortOption,
-                onSortOptionChanged = onSortOptionChanged,
-                currentView = currentPaneType,
-                onViewChanged = { newPaneType ->
-                    PrefManager.libraryLayout = newPaneType
-                    currentPaneType = newPaneType
-                },
-                steamCollections = state.steamCollections,
-                selectedSteamCollectionIds = state.selectedSteamCollectionIds,
-                steamCollectionCounts = state.steamCollectionCounts,
-                skippedDynamicCollections = state.skippedDynamicCollections,
-                isSteamConnected = isSteamConnected,
-                isOffline = isOffline,
-                onSteamCollectionToggle = onSteamCollectionToggle,
-                onClearSteamCollections = onClearSteamCollections,
-            )
-
-            // System menu (START) - renders on top of everything
-            val context = LocalContext.current
-            val gogLoggedIn = app.gamenative.service.gog.GOGAuthManager.hasStoredCredentials(context)
-            val epicLoggedIn = app.gamenative.service.epic.EpicAuthManager.hasStoredCredentials(context)
-            val amazonLoggedIn = app.gamenative.service.amazon.AmazonAuthManager.hasStoredCredentials(context)
-
-            // Accounts dialog state
-            var showAccountsDialog by remember { mutableStateOf(false) }
-            var accountsDialogPlatform by remember { mutableStateOf("") }
-            val accountManager = PluviaApp.getInstance().accountManager
-            val allAccounts by accountManager.allAccounts.collectAsStateWithLifecycle()
-            val scope = rememberCoroutineScope()
-
-            SystemMenu(
-                isOpen = isSystemMenuOpen,
-                onDismiss = { isSystemMenuOpen = false },
-                onNavigateRoute = onNavigateRoute,
-                onDownloadsClick = onDownloadsClick,
-                onLogout = onLogout,
-                onGoOnline = onGoOnline,
-                isOffline = isOffline,
-                gogLoggedIn = gogLoggedIn,
-                epicLoggedIn = epicLoggedIn,
-                amazonLoggedIn = amazonLoggedIn,
-                onGogLoginClick = {
-                    gogOAuthLauncher.launch(Intent(context, GOGOAuthActivity::class.java))
-                },
-                onGogLogoutClick = {
-                    PlatformAuthUiHelpers.logoutGog(
-                        context = context,
-                        scope = lifecycleScope,
-                        callbacks = PlatformLogoutCallbacks(),
-                    )
-                },
-                onEpicLoginClick = {
-                    epicOAuthLauncher.launch(Intent(context, EpicOAuthActivity::class.java))
-                },
-                onEpicLogoutClick = {
-                    PlatformAuthUiHelpers.logoutEpic(
-                        context = context,
-                        scope = lifecycleScope,
-                        callbacks = PlatformLogoutCallbacks(),
-                    )
-                },
-                onAmazonLoginClick = {
-                    amazonOAuthLauncher.launch(Intent(context, AmazonOAuthActivity::class.java))
-                },
-                onAmazonLogoutClick = {
-                    PlatformAuthUiHelpers.logoutAmazon(
-                        context = context,
-                        scope = lifecycleScope,
-                        callbacks = PlatformLogoutCallbacks(),
-                    )
-                },
-                onSteamAccountsClick = {
-                    accountsDialogPlatform = "STEAM"
-                    showAccountsDialog = true
-                },
-                onGogAccountsClick = {
-                    accountsDialogPlatform = "GOG"
-                    showAccountsDialog = true
-                },
-                onEpicAccountsClick = {
-                    accountsDialogPlatform = "EPIC"
-                    showAccountsDialog = true
-                },
-                onAmazonAccountsClick = {
-                    accountsDialogPlatform = "AMAZON"
-                    showAccountsDialog = true
-                },
-            )
-
-            // Accounts Dialog
-            if (showAccountsDialog) {
-                val platformAccounts = allAccounts[accountsDialogPlatform] ?: emptyList()
-                AccountsDialog(
-                    openDialog = showAccountsDialog,
-                    platform = accountsDialogPlatform,
-                    accounts = platformAccounts,
-                    onDismiss = { showAccountsDialog = false },
-                    onAddAccount = {
-                        when (accountsDialogPlatform) {
-                            "GOG" -> gogOAuthLauncher.launch(Intent(context, GOGOAuthActivity::class.java))
-                            "EPIC" -> epicOAuthLauncher.launch(Intent(context, EpicOAuthActivity::class.java))
-                            "AMAZON" -> amazonOAuthLauncher.launch(Intent(context, AmazonOAuthActivity::class.java))
-                            "STEAM" -> {
-                                onLogout()
-                                // User will need to log in again with different account
-                            }
-                        }
-                    },
-                    onRemoveAccount = { account ->
-                        scope.launch {
-                            accountManager.removeAccount(context, account.platform, account.accountId)
-                        }
-                    },
-                    onSetPrimary = { account ->
-                        scope.launch {
-                            accountManager.setPrimaryAccount(context, account.platform, account.accountId)
-                        }
-                    },
-                )
-            }
         }
 
         // Pre-import dialog (modern add path)
@@ -1585,9 +1340,6 @@ private fun Preview_LibraryScreenContent() {
             onSortOptionChanged = {},
             onSteamCollectionToggle = {},
             onClearSteamCollections = {},
-            onOptionsPanelToggle = { isOpen ->
-                state = state.copy(isOptionsPanelOpen = isOpen)
-            },
             onTabChanged = { tab ->
                 state = state.copy(currentTab = tab)
             },

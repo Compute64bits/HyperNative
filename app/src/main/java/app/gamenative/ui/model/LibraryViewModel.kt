@@ -145,7 +145,6 @@ class LibraryViewModel @Inject constructor(
 
     // Cached recommendation (fetched once at startup)
     @Volatile private var cachedRecommendation: RecommendedGame? = null
-    @Volatile private var cachedFeatured: app.gamenative.data.FeaturedItem? = null
     @Volatile private var cachedRecTeaser: Boolean = false
     @Volatile private var cachedRecLoading: Boolean = false
 
@@ -322,11 +321,7 @@ class LibraryViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             val hero = RecommendationRepository.getHero(context)
             val daySeed = System.currentTimeMillis() / (24L * 60 * 60 * 1000)
-            cachedFeatured = hero.featured
             cachedRecommendation = when {
-                // A live featured takes the slot (still gated by the showRecommendations
-                // toggle at display time), regardless of GOG consent.
-                hero.featured != null -> null
                 PrefManager.showRecommendations && PrefManager.recDisclosureShown -> runCatching {
                     val owned = GogSeedCollector.collect(
                         context,
@@ -340,11 +335,10 @@ class LibraryViewModel @Inject constructor(
                 }.getOrNull() ?: hero.recommendation
                 else -> hero.recommendation
             }
-            // Frosted teaser: pre-consent only, never over a featured slot. Shows every day
-            // until the first "Not now", then one day in three. A frosted day stays frosted
-            // all day, dismissed or not.
+            // Frosted teaser: pre-consent only. Shows every day until the first "Not now",
+            // then one day in three. A frosted day stays frosted all day, dismissed or not.
             val dismissedDay = PrefManager.recTeaserDismissedDay
-            cachedRecTeaser = hero.featured == null &&
+            cachedRecTeaser =
                 PrefManager.showRecommendations &&
                 !PrefManager.recDisclosureShown &&
                 (dismissedDay == 0L || dismissedDay == daySeed || daySeed % 3 == 0L)
@@ -827,6 +821,8 @@ class LibraryViewModel @Inject constructor(
             val gogEntries = filteredGOGGames
                 .filter { passesCompatibleFilter(it.title) }
                 .filter { passesStatsFilters(currentState, GameSource.GOG, it.title) }
+                .groupBy { it.id }
+                .map { (_, games) -> games.firstOrNull { it.isInstalled } ?: games.first() }
                 .map { game ->
                     val appId = "${GameSource.GOG.name}_${game.id}"
                     LibraryEntry(
@@ -870,6 +866,8 @@ class LibraryViewModel @Inject constructor(
             val epicEntries = filteredEpicGames
                 .filter { passesCompatibleFilter(it.title) }
                 .filter { passesStatsFilters(currentState, GameSource.EPIC, it.title) }
+                .groupBy { it.catalogId }
+                .map { (_, games) -> games.firstOrNull { it.isInstalled } ?: games.first() }
                 .map { game ->
                     val appId = "${GameSource.EPIC.name}_${game.id}"
                     LibraryEntry(
@@ -913,6 +911,8 @@ class LibraryViewModel @Inject constructor(
             val amazonEntries = filteredAmazonGames
                 .filter { passesCompatibleFilter(it.title) }
                 .filter { passesStatsFilters(currentState, GameSource.AMAZON, it.title) }
+                .groupBy { it.productId }
+                .map { (_, games) -> games.firstOrNull { it.isInstalled } ?: games.first() }
                 .map { game ->
                     val layoutHero = AmazonArtwork.layoutHeroFromProductJson(game.productJson)
                         .ifEmpty { game.heroUrl.ifEmpty { game.artUrl } }
@@ -1066,44 +1066,27 @@ class LibraryViewModel @Inject constructor(
             val endIndex = min((clampedPage + 1) * pageSize, totalFound)
             var pagedList = combined.take(endIndex)
 
-            // Prepend the hero (featured > recommendation) as first item on ALL tab when
-            // enabled and not searching.
-            val featured = cachedFeatured
+            // Prepend the recommendation as first item on ALL tab when enabled and not searching.
             val rec = cachedRecommendation
             if (PrefManager.showRecommendations
                 && currentTab == LibraryTab.ALL
                 && currentState.searchQuery.isEmpty()
             ) {
-                val heroItem = when {
-                    featured != null -> LibraryItem(
+                val heroItem = rec?.let {
+                    LibraryItem(
                         index = -1,
-                        appId = "FEATURED_${featured.campaignId}",
-                        name = featured.title,
-                        heroImageUrl = featured.heroImageUrl,
-                        headerImageUrl = featured.heroImageUrl,
-                        capsuleImageUrl = featured.capsuleImageUrl ?: featured.heroImageUrl,
-                        iconHash = featured.iconUrl ?: featured.capsuleImageUrl ?: featured.heroImageUrl,
+                        appId = "RECOMMENDED_${it.id}",
+                        name = it.name,
+                        heroImageUrl = it.heroImageUrl,
+                        capsuleImageUrl = it.capsuleImageUrl,
+                        iconHash = it.iconUrl ?: it.capsuleImageUrl,
                         isRecommended = true,
-                        isFeatured = true,
-                        recommendedGameId = featured.campaignId,
-                        recSource = "hero",
-                        gameSource = GameSource.STEAM,
-                    )
-                    rec != null -> LibraryItem(
-                        index = -1,
-                        appId = "RECOMMENDED_${rec.id}",
-                        name = rec.name,
-                        heroImageUrl = rec.heroImageUrl,
-                        capsuleImageUrl = rec.capsuleImageUrl,
-                        iconHash = rec.iconUrl ?: rec.capsuleImageUrl,
-                        isRecommended = true,
-                        recommendedGameId = rec.id,
+                        recommendedGameId = it.id,
                         recSource = "hero",
                         gameSource = GameSource.STEAM,
                         isRecTeaser = cachedRecTeaser || cachedRecLoading,
                         isRecLoading = cachedRecLoading,
                     )
-                    else -> null
                 }
                 if (heroItem != null) {
                     pagedList = listOf(heroItem) + pagedList.map { it.copy(index = it.index + 1) }

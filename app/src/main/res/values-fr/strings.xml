@@ -91,6 +91,14 @@
     <string name="confirm_delete">Confirmer la suppression</string>
     <string name="destination_library">Bibliothèque</string>
     <string name="destination_downloads">Téléchargements et stockage</string>
+    <string name="destination_discover">Découvrir</string>
+    <string name="destination_my_games">Mes jeux</string>
+    <string name="destination_settings">Paramètres</string>
+    <string name="settings_section_profile">Profil</string>
+    <string name="settings_section_accounts">Comptes</string>
+    <string name="settings_section_library_options">Options de la bibliothèque</string>
+
+
     <string name="downloads_section_title">Téléchargements</string>
 
     <string name="downloads_empty">Aucun téléchargement actif</string>
@@ -2336,4 +2344,23 @@
     <string name="favorite_added">Ajouté aux favoris</string>
     <string name="favorite_added_named">%1$s ajouté aux favoris</string>
     <string name="xr_refresh_rate">Taux de rafraîchissement VR</string>
+    <string name="accounts_steam">Comptes Steam</string>
+    <string name="accounts_gog">Comptes GOG</string>
+    <string name="accounts_epic">Comptes Epic</string>
+    <string name="accounts_amazon">Comptes Amazon Games</string>
+    <string name="add_account">Ajouter un compte</string>
+    <string name="remove_account">Supprimer le compte</string>
+    <string name="remove_account_confirmation">Supprimer « %s » de vos comptes ?</string>
+    <string name="set_as_primary">Définir comme principal</string>
+    <string name="primary_account">Principal</string>
+    <string name="logout">Déconnexion</string>
+    <string name="logout_confirm_title">Déconnexion ?</string>
+    <string name="logout_confirm_message">Cela supprimera vos identifiants et effacera votre bibliothèque de cet appareil. Vous pourrez vous reconnecter à tout moment.</string>
+    <string name="logout_confirm_message_specific">Cela supprimera le compte \"%s\" et ses identifiants de cet appareil. Vous pourrez vous reconnecter à tout moment.</string>
+    <string name="logout_confirm">Déconnexion</string>
+    <string name="logout_account">Déconnecter %s</string>
+    <string name="switch_account">Changer de compte</string>
+    <string name="no_accounts_connected">Aucun compte connecté</string>
+    <string name="launch_with_account">Lancer avec : %s</string>
+    <string name="select_account">Sélectionner un compte</string>
 </resources>

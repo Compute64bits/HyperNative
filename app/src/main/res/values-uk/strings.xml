@@ -86,6 +86,14 @@
     <string name="confirm_delete">Підтвердити видалення</string>
     <string name="destination_library">Бібліотека</string>
     <string name="destination_downloads">Завантаження й сховище</string>
+    <string name="destination_discover">Огляд</string>
+    <string name="destination_my_games">Мої ігри</string>
+    <string name="destination_settings">Налаштування</string>
+    <string name="settings_section_profile">Профіль</string>
+    <string name="settings_section_accounts">Облікові записи</string>
+    <string name="settings_section_library_options">Налаштування бібліотеки</string>
+
+
     <string name="downloads_section_title">Завантаження</string>
 
     <!-- Library Tabs -->
@@ -2336,4 +2344,23 @@
     <string name="favorite_added">Додано до вибраного</string>
     <string name="favorite_added_named">%1$s додано до вибраного</string>
     <string name="xr_refresh_rate">Частота оновлення VR</string>
+    <string name="accounts_steam">Облікові записи Steam</string>
+    <string name="accounts_gog">Облікові записи GOG</string>
+    <string name="accounts_epic">Облікові записи Epic</string>
+    <string name="accounts_amazon">Облікові записи Amazon Games</string>
+    <string name="add_account">Додати обліковий запис</string>
+    <string name="remove_account">Видалити обліковий запис</string>
+    <string name="remove_account_confirmation">Видалити «%s» з ваших облікових записів?</string>
+    <string name="set_as_primary">Встановити як основний</string>
+    <string name="primary_account">Основний</string>
+    <string name="logout">Вийти</string>
+    <string name="logout_confirm_title">Вийти?</string>
+    <string name="logout_confirm_message">Це видалить ваші облікові дані та очистить бібліотеку з цього пристрою. Ви можете увійти знову в будь-який час.</string>
+    <string name="logout_confirm_message_specific">Це видалить обліковий запис \"%s\" та його облікові дані з цього пристрою. Ви можете увійти знову в будь-який час.</string>
+    <string name="logout_confirm">Вийти</string>
+    <string name="logout_account">Вийти з %s</string>
+    <string name="switch_account">Змінити обліковий запис</string>
+    <string name="no_accounts_connected">Немає підключених облікових записів</string>
+    <string name="launch_with_account">Запустити з: %s</string>
+    <string name="select_account">Обрати обліковий запис</string>
 </resources>

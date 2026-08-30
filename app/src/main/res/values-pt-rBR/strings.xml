@@ -42,6 +42,14 @@
     <string name="confirm_delete">Confirmar Deleção</string>
     <string name="destination_library">Biblioteca</string>
     <string name="destination_downloads">Downloads e armazenamento</string>
+    <string name="destination_discover">Descobrir</string>
+    <string name="destination_my_games">Meus jogos</string>
+    <string name="destination_settings">Configurações</string>
+    <string name="settings_section_profile">Perfil</string>
+    <string name="settings_section_accounts">Contas</string>
+    <string name="settings_section_library_options">Opções da biblioteca</string>
+
+
     <string name="downloads_section_title">Downloads</string>
 
     <string name="downloads_empty">Nenhum download ativo</string>
@@ -2206,4 +2214,23 @@
     <string name="favorite_added">Adicionado aos favoritos</string>
     <string name="favorite_added_named">%1$s adicionado aos favoritos</string>
     <string name="xr_refresh_rate">Taxa de atualização de VR</string>
+    <string name="accounts_steam">Contas Steam</string>
+    <string name="accounts_gog">Contas GOG</string>
+    <string name="accounts_epic">Contas Epic</string>
+    <string name="accounts_amazon">Contas Amazon Games</string>
+    <string name="add_account">Adicionar conta</string>
+    <string name="remove_account">Remover conta</string>
+    <string name="remove_account_confirmation">Remover "%s" das suas contas?</string>
+    <string name="set_as_primary">Definir como principal</string>
+    <string name="primary_account">Principal</string>
+    <string name="logout">Sair</string>
+    <string name="logout_confirm_title">Sair?</string>
+    <string name="logout_confirm_message">Isso removerá suas credenciais e limpará sua biblioteca deste dispositivo. Você pode fazer login novamente a qualquer momento.</string>
+    <string name="logout_confirm_message_specific">Isso removerá a conta \"%s\" e suas credenciais deste dispositivo. Você pode fazer login novamente a qualquer momento.</string>
+    <string name="logout_confirm">Sair</string>
+    <string name="logout_account">Sair de %s</string>
+    <string name="switch_account">Trocar de conta</string>
+    <string name="no_accounts_connected">Nenhuma conta conectada</string>
+    <string name="launch_with_account">Iniciar com: %s</string>
+    <string name="select_account">Selecionar conta</string>
 </resources>

@@ -12,6 +12,7 @@ app/release/baselineProfiles/
 app/release/output-metadata.json
 
 # Local configuration file (sdk path, etc)
+CODEBASE.md
 local.properties
 app/src/main/assets/recommendations.json
 
