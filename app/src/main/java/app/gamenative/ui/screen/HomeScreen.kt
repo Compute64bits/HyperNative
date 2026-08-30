@@ -56,6 +56,7 @@ import app.gamenative.utils.PlatformOAuthHandlers
 import app.gamenative.service.gog.GOGAuthManager
 import app.gamenative.service.epic.EpicAuthManager
 import app.gamenative.service.amazon.AmazonAuthManager
+import app.gamenative.service.SteamService
 import com.materialkolor.PaletteStyle
 import java.util.EnumSet
 import kotlinx.coroutines.launch
@@ -245,6 +246,15 @@ fun HomeScreen(
                     onGogAddAccount = { gogOAuthLauncher.launch(Intent(context, GOGOAuthActivity::class.java)) },
                     onEpicAddAccount = { epicOAuthLauncher.launch(Intent(context, EpicOAuthActivity::class.java)) },
                     onAmazonAddAccount = { amazonOAuthLauncher.launch(Intent(context, AmazonOAuthActivity::class.java)) },
+                    onSteamLoginClick = { onNavigateRoute(PluviaScreen.LoginUser.route) },
+                    onSteamLogoutClick = { account ->
+                        lifecycleScope.launch {
+                            accountManager.removeAccount(context, "STEAM", account.accountId)
+                            SnackbarManager.show(context.getString(R.string.steam_logout_success))
+                        }
+                        SteamService.logOut()
+                    },
+                    onSteamAddAccount = { onNavigateRoute(PluviaScreen.LoginUser.route) },
                     selectedFilters = selectedFilters,
                     onFilterChanged = { filter ->
                         val newFilters = EnumSet.copyOf(selectedFilters as EnumSet<AppFilter>)

@@ -19,11 +19,25 @@
 
 **HyperNative** is a community-driven fork of [GameNative](https://github.com/utkarshdalal/GameNative), developed and maintained with AI assistance. It aims to deliver a private, lightweight, and clutter-free local PC gaming experience on Android.
 
+---
+
 ## 🚀 Key Improvements in HyperNative
 
 * 🛡️ **Zero Telemetry & Tracking**: All third-party analytics (PostHog, background usage tracking, and diagnostic telemetry) have been completely removed. Your gameplay, account details, and session data stay strictly local.
 * 👥 **Universal Multi-Account Support**: Connect and manage multiple accounts for Steam, Epic Games, GOG, and Amazon Games. Includes seamless switching, default account star-toggling, and per-game launch account overrides.
+* 🎨 **Streamlined & Clean UI**: A refreshed, simplified, and distraction-free interface optimized for smooth navigation and direct access to your game libraries.
 * 🤖 **AI-Assisted Maintenance**: Code refactoring, bug fixes, and feature implementations driven and refined with modern AI workflows. (Gemini Flash 3.7 Extended and Mimo v2.5 Pro)
+
+---
+
+
+## 📸 Screenshots
+
+<p align="center">
+  <img src="./screenshots/discover.jpg" width="31%" alt="Discover Screen" />
+  <img src="./screenshots/mygames.jpg" width="31%" alt="My Games Screen" />
+  <img src="./screenshots/settings.jpg" width="31%" alt="Settings Screen" />
+</p>
 
 ---
 
@@ -40,7 +54,7 @@ Grab the latest pre-built APK from GitHub Releases :
 - [x] Complete telemetry and tracker removal
 - [x] Multi-account management with default star toggle (Steam, Epic, GOG, Amazon)
 - [x] Per-game launch account selector
-- [ ] Streamlined and modernized UI
+- [x] Streamlined and modernized UI
 - [ ] One-click update button for game compatibility configurations
 
 ---
@@ -65,32 +79,42 @@ Grab the latest pre-built APK from GitHub Releases :
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/Compute64bits/HyperNative.git
+   git clone [https://github.com/Compute64bits/HyperNative.git](https://github.com/Compute64bits/HyperNative.git)
    cd HyperNative
-   ```
+
+```
 
 2. **Configure `local.properties` (Required):**
-   ```bash
-   echo "sdk.dir=$HOME/Android/Sdk" > local.properties
-   ```
+```bash
+echo "sdk.dir=$HOME/Android/Sdk" > local.properties
 
-   *(Optional) Add your SteamGridDB API key for automatic cover scraping:*
-   ```bash
-   echo "STEAMGRIDDB_API_KEY=your_api_key_here" >> local.properties
-   ```
+```
+
+
+*(Optional) Add your SteamGridDB API key for automatic cover scraping:*
+```bash
+echo "STEAMGRIDDB_API_KEY=your_api_key_here" >> local.properties
+
+```
 
 
 3. **Build the APK:**
+
 * **Debug build:**
-   ```bash
-  ./gradlew :app:assembleModernDebug --no-daemon -Dorg.gradle.jvmargs="-Xmx3584m"
-   ```
+```bash
+./gradlew :app:assembleModernDebug --no-daemon -Dorg.gradle.jvmargs="-Xmx3584m"
+
+```
 
 
 * **Release build (Low-RAM configuration):**
-   ```bash
-  ./gradlew :app:assembleModernRelease --no-daemon --max-workers=1 -Dorg.gradle.jvmargs="-Xmx3072m" -x lint -x lintVitalAnalyzeModernRelease -x test
-   ```
+```bash
+./gradlew :app:assembleModernRelease --no-daemon --max-workers=1 -Dorg.gradle.jvmargs="-Xmx3072m" -x lint -x lintVitalAnalyzeModernRelease -x test
+
+```
+
+
+
 APK binaries will be generated in `app/build/outputs/apk/modern/`.
 
 ---

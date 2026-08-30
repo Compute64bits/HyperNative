@@ -117,6 +117,9 @@ fun HomeSettingsScreen(
     onGogAddAccount: () -> Unit = {},
     onEpicAddAccount: () -> Unit = {},
     onAmazonAddAccount: () -> Unit = {},
+    onSteamLoginClick: () -> Unit = {},
+    onSteamLogoutClick: (PlatformAccount) -> Unit = {},
+    onSteamAddAccount: () -> Unit = {},
     selectedFilters: EnumSet<AppFilter>,
     onFilterChanged: (AppFilter) -> Unit,
     currentSortOption: SortOption,
@@ -322,19 +325,19 @@ fun HomeSettingsScreen(
                     accountDisplayName = steamPrimary?.displayName ?: PrefManager.steamUserName,
                     isPrimary = true,
                     accounts = steamAccounts,
-                    onLoginClick = { },
+                    onLoginClick = onSteamLoginClick,
                     onSetPrimary = { account ->
                         scope.launch {
                             accountManager.setPrimaryAccount(context, "STEAM", account.accountId)
                         }
                     },
-                    onAddAccount = { },
+                    onAddAccount = onSteamAddAccount,
                     onSwitchAccount = { account ->
                         scope.launch {
                             accountManager.setPrimaryAccount(context, "STEAM", account.accountId)
                         }
                     },
-                    onLogoutClick = { },
+                    onLogoutClick = onSteamLogoutClick,
                 )
 
                 // GOG

@@ -1692,6 +1692,7 @@
     <string name="amazon_logout_confirm_message">This will remove your Amazon Games credentials and clear your Amazon library from this device. You can sign in again at any time.</string>
     <string name="amazon_logout_confirm">Logout</string>
     <string name="amazon_logout_success">Logged out from Amazon Games successfully</string>
+    <string name="steam_logout_success">Logged out from Steam successfully</string>
     <string name="amazon_logout_failed">Failed to logout: %s</string>
     <string name="amazon_logout_in_progress">Logging out from Amazon Games…</string>
     <string name="manifest_downloading_item">Downloading %1$s...</string>
