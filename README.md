@@ -81,39 +81,31 @@ Grab the latest pre-built APK from GitHub Releases :
    ```bash
    git clone [https://github.com/Compute64bits/HyperNative.git](https://github.com/Compute64bits/HyperNative.git)
    cd HyperNative
-
-```
+   ```
 
 2. **Configure `local.properties` (Required):**
-```bash
-echo "sdk.dir=$HOME/Android/Sdk" > local.properties
+   ```bash
+   echo "sdk.dir=$HOME/Android/Sdk" > local.properties
+   ```
 
-```
 
-
-*(Optional) Add your SteamGridDB API key for automatic cover scraping:*
-```bash
-echo "STEAMGRIDDB_API_KEY=your_api_key_here" >> local.properties
-
-```
+   *(Optional) Add your SteamGridDB API key for automatic cover scraping:*
+   ```bash
+   echo "STEAMGRIDDB_API_KEY=your_api_key_here" >> local.properties
+   ```
 
 
 3. **Build the APK:**
 
-* **Debug build:**
-```bash
-./gradlew :app:assembleModernDebug --no-daemon -Dorg.gradle.jvmargs="-Xmx3584m"
+   * **Debug build:**
+   ```bash
+   ./gradlew :app:assembleModernDebug --no-daemon -Dorg.gradle.jvmargs="-Xmx3584m"
+   ```
 
-```
-
-
-* **Release build (Low-RAM configuration):**
-```bash
-./gradlew :app:assembleModernRelease --no-daemon --max-workers=1 -Dorg.gradle.jvmargs="-Xmx3072m" -x lint -x lintVitalAnalyzeModernRelease -x test
-
-```
-
-
+   * **Release build (Low-RAM configuration):**
+   ```bash
+   ./gradlew :app:assembleModernRelease --no-daemon --max-workers=1 -Dorg.gradle.jvmargs="-Xmx3072m" -x lint -x lintVitalAnalyzeModernRelease -x test
+   ```
 
 APK binaries will be generated in `app/build/outputs/apk/modern/`.
 
