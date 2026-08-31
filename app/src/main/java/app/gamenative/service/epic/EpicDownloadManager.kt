@@ -139,12 +139,13 @@ class EpicDownloadManager @Inject constructor(
 
             Timber.tag("Epic").i("Filtered to ${dlcsToDownload.size} DLC(s) for ${game.title}")
 
-            // Fetch manifest binary and CDN URLs from Epic
+            // Fetch manifest binary and CDN URLs from Epic, using the game's owning account
             val manifestResult = epicManager.fetchManifestFromEpic(
                 context,
                 game.namespace,
                 game.catalogId,
                 game.appName,
+                game.accountId,
             )
             if (manifestResult.isFailure) {
                 return@withContext Result.failure(
@@ -204,6 +205,7 @@ class EpicDownloadManager @Inject constructor(
                             dlc.namespace,
                             dlc.catalogId,
                             dlc.appName,
+                            dlc.accountId,
                         )
                         if (dlcManifestResult.isSuccess) {
                             val dlcManifest = dlcManifestResult.getOrNull()!!

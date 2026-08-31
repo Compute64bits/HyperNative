@@ -40,7 +40,6 @@ import app.gamenative.R
 import app.gamenative.enums.AppTheme
 import app.gamenative.ui.enums.HomeDestination
 import app.gamenative.ui.enums.PaneType
-import app.gamenative.ui.enums.SortOption
 import app.gamenative.ui.enums.AppFilter
 import app.gamenative.ui.model.HomeViewModel
 import app.gamenative.ui.screen.auth.AmazonOAuthActivity
@@ -171,7 +170,6 @@ fun HomeScreen(
         }
     }
 
-    var currentSortOption by remember { mutableStateOf(PrefManager.librarySortOption) }
     var selectedFilters by remember { mutableStateOf(PrefManager.libraryFilter) }
     var currentView by remember { mutableStateOf(PrefManager.libraryLayout) }
 
@@ -261,11 +259,6 @@ fun HomeScreen(
                         if (newFilters.contains(filter)) newFilters.remove(filter) else newFilters.add(filter)
                         selectedFilters = newFilters
                         PrefManager.libraryFilter = newFilters
-                    },
-                    currentSortOption = currentSortOption,
-                    onSortOptionChanged = { option ->
-                        currentSortOption = option
-                        PrefManager.librarySortOption = option
                     },
                     currentView = currentView,
                     onViewChanged = { view ->

@@ -784,16 +784,25 @@ class EpicManager @Inject constructor(
      * Fetch manifest binary data from Epic API and CDN
      *
      * Returns the raw manifest bytes and CDN base URLs from the API response
+     *
+     * @param accountId If non-empty, load credentials for this specific account instead of the
+     *                  active/primary account. Required for multi-account support so that games
+     *                  owned by a non-primary account can be downloaded.
      */
     suspend fun fetchManifestFromEpic(
         context: Context,
         namespace: String,
         catalogItemId: String,
         appName: String,
+        accountId: String = "",
     ): Result<ManifestResult> = withContext(Dispatchers.IO) {
         try {
-            // Get credentials
-            val credentials = EpicAuthManager.getStoredCredentials(context)
+            // Get credentials — use per-account store when accountId is provided
+            val credentials = if (accountId.isNotEmpty()) {
+                EpicAuthManager.getCredentialsForAccount(context, accountId)
+            } else {
+                EpicAuthManager.getStoredCredentials(context)
+            }
             if (credentials.isFailure) {
                 return@withContext Result.failure(credentials.exceptionOrNull() ?: Exception("No credentials"))
             }
@@ -1102,8 +1111,8 @@ class EpicManager @Inject constructor(
 
             val appName = game.appName
 
-            // Fetch manifest using shared function
-            val manifestResult = fetchManifestFromEpic(context, game.namespace, game.catalogId, game.appName)
+            // Fetch manifest using shared function, with the game's owning account
+            val manifestResult = fetchManifestFromEpic(context, game.namespace, game.catalogId, game.appName, game.accountId)
             if (manifestResult.isFailure) {
                 Timber.tag("Epic").w("Failed to fetch manifest: ${manifestResult.exceptionOrNull()?.message}")
                 return@withContext ManifestSizes(installSize = 0L, downloadSize = 0L)

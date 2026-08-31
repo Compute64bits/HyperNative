@@ -130,6 +130,7 @@ fun RecommendedTabPane(
                     onNavigate = { appId -> items.find { it.appId == appId }?.let(onNavigate) },
                     onRefresh = { viewModel.refresh() },
                     modifier = Modifier.fillMaxSize(),
+                    topContentPadding = 8.dp,
                     firstGridItemFocusRequester = firstGridItemFocusRequester,
                     focusTargetListIndex = focusTargetListIndex,
                 )

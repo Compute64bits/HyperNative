@@ -103,6 +103,7 @@ import app.gamenative.ui.screen.library.components.LibraryListPane
 import app.gamenative.ui.screen.library.components.LibraryFavoritesEmptyState
 import app.gamenative.ui.screen.library.components.LibrarySearchBar
 import app.gamenative.ui.screen.library.components.LibrarySourceNotLoggedInSplash
+import app.gamenative.ui.screen.library.components.LibrarySortDropdown
 import app.gamenative.ui.screen.library.components.LibraryTabBar
 import app.gamenative.ui.screen.library.components.toggleFavorite
 import app.gamenative.ui.screen.auth.AmazonOAuthActivity
@@ -1088,6 +1089,15 @@ private fun LibraryScreenContent(
                                     pendingCarouselFocusRequest = false
                                 }
                             },
+                    )
+
+                    // Sort dropdown below tab bar, right-aligned
+                    LibrarySortDropdown(
+                        currentSortOption = state.currentSortOption,
+                        onSortOptionChanged = onSortOptionChanged,
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .padding(top = 52.dp, end = 12.dp),
                     )
                 }
             }

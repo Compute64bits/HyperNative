@@ -402,7 +402,11 @@ class LibraryViewModel @Inject constructor(
     fun onSortOptionChanged(sortOption: SortOption) {
         PrefManager.librarySortOption = sortOption
         _state.update { it.copy(currentSortOption = sortOption) }
-        onFilterApps()
+        onFilterApps().invokeOnCompletion {
+            viewModelScope.launch {
+                listState.scrollToItem(0)
+            }
+        }
     }
 
     fun onOptionsPanelToggle(isOpen: Boolean) {

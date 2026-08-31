@@ -88,7 +88,6 @@ import app.gamenative.ui.component.OptionRadioItem
 import app.gamenative.ui.component.OptionSectionHeader
 import app.gamenative.ui.enums.AppFilter
 import app.gamenative.ui.enums.PaneType
-import app.gamenative.ui.enums.SortOption
 import app.gamenative.ui.theme.PluviaTheme
 import app.gamenative.ui.util.SteamIconImage
 import app.gamenative.utils.getAvatarURL
@@ -122,8 +121,6 @@ fun HomeSettingsScreen(
     onSteamAddAccount: () -> Unit = {},
     selectedFilters: EnumSet<AppFilter>,
     onFilterChanged: (AppFilter) -> Unit,
-    currentSortOption: SortOption,
-    onSortOptionChanged: (SortOption) -> Unit,
     currentView: PaneType,
     onViewChanged: (PaneType) -> Unit,
     isSteamConnected: Boolean,
@@ -416,29 +413,6 @@ fun HomeSettingsScreen(
         ) {
             // Game Stats Key
             GameStatsKey(modifier = Modifier.padding(horizontal = 8.dp))
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            // Sort By
-            OptionSectionHeader(
-                text = stringResource(R.string.options_sort_by),
-                modifier = Modifier.padding(horizontal = 8.dp),
-            )
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 8.dp),
-                verticalArrangement = Arrangement.spacedBy(2.dp),
-            ) {
-                SortOption.entries.forEach { option ->
-                    OptionRadioItem(
-                        text = stringResource(option.displayTextRes),
-                        selected = currentSortOption == option,
-                        onClick = { onSortOptionChanged(option) },
-                        modifier = Modifier.fillMaxWidth(),
-                    )
-                }
-            }
 
             Spacer(modifier = Modifier.height(12.dp))
 
@@ -998,8 +972,6 @@ private fun Preview_SettingsScreen() {
             onAmazonLoginClick = { },
             selectedFilters = EnumSet.of(AppFilter.GAME),
             onFilterChanged = { },
-            currentSortOption = SortOption.INSTALLED_FIRST,
-            onSortOptionChanged = { },
             currentView = PaneType.GRID_CAPSULE,
             onViewChanged = { },
             isSteamConnected = true,

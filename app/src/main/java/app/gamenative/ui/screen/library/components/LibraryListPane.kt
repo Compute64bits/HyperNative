@@ -41,6 +41,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import app.gamenative.PrefManager
 import app.gamenative.data.GameSource
@@ -122,6 +123,7 @@ internal fun LibraryListPane(
     onNavigate: (String) -> Unit,
     onRefresh: () -> Unit,
     modifier: Modifier = Modifier,
+    topContentPadding: Dp = 96.dp,
     onFocusedIndexChanged: (Int) -> Unit = {},
 ) {
     val context = LocalContext.current
@@ -247,7 +249,7 @@ internal fun LibraryListPane(
                             modifier = Modifier.fillMaxSize(),
                             horizontalArrangement = Arrangement.spacedBy(gridSpacing),
                             contentPadding = PaddingValues(
-                                top = 80.dp,
+                                top = topContentPadding,
                                 start = horizontalPadding,
                                 end = horizontalPadding + 4.dp,
                                 bottom = 72.dp,
@@ -338,7 +340,7 @@ internal fun LibraryListPane(
                         modifier = Modifier.fillMaxSize(),
                         horizontalArrangement = Arrangement.spacedBy(gridSpacing),
                         contentPadding = PaddingValues(
-                            top = 80.dp,
+                            top = topContentPadding,
                             start = horizontalPadding,
                             end = horizontalPadding,
                             bottom = 72.dp,

@@ -151,41 +151,75 @@ object EpicAuthManager {
                 return Result.failure(Exception("Failed to load credentials"))
             }
 
-            // Check if token is expired (with 5 minute buffer)
-            val now = System.currentTimeMillis()
-            val expiresAt = credentials.expiresAt
-            val bufferMs = 5 * 60 * 1000 // 5 minutes
-
-            if (now + bufferMs >= expiresAt) {
-                Timber.d("Access token expired, refreshing...")
-
-                val refreshResult = EpicAuthClient.refreshAccessToken(credentials.refreshToken)
-
-                if (refreshResult.isFailure) {
-                    Timber.e("Failed to refresh token")
-                    return Result.failure(Exception("Failed to refresh expired token: ${refreshResult.exceptionOrNull()?.message}"))
-                }
-
-                val authResponse = refreshResult.getOrNull()!!
-                val refreshedCredentials = EpicCredentials(
-                    accessToken = authResponse.accessToken,
-                    refreshToken = authResponse.refreshToken,
-                    accountId = authResponse.accountId,
-                    displayName = authResponse.displayName,
-                    expiresAt = authResponse.expiresAt
-                )
-
-                saveCredentials(context, refreshedCredentials)
-                Timber.i("Access token refreshed successfully")
-
-                return Result.success(refreshedCredentials)
-            }
-
-            Result.success(credentials)
+            refreshIfNeeded(context, credentials)
         } catch (e: Exception) {
             Timber.e(e, "Error getting Epic credentials: ${e.message}")
             Result.failure(Exception("Error getting credentials: ${e.message}", e))
         }
+    }
+
+    /**
+     * Get credentials for a specific account ID, loading from the per-account store.
+     * Falls back to the active credentials if the per-account file doesn't exist.
+     * Handles token refresh automatically.
+     */
+    suspend fun getCredentialsForAccount(context: Context, accountId: String): Result<EpicCredentials> {
+        return try {
+            if (accountId.isEmpty()) {
+                return getStoredCredentials(context)
+            }
+
+            val accountFile = File(context.filesDir, "epic/accounts/$accountId/credentials.json")
+            val credentials = if (accountFile.exists()) {
+                loadCredentialsFromFile(accountFile)
+            } else {
+                null
+            }
+
+            // If per-account file missing or unreadable, fall back to active credentials
+            // (they may already belong to this account)
+            val resolved = credentials ?: loadCredentials(context)
+            if (resolved == null) {
+                return Result.failure(Exception("No credentials found for account $accountId"))
+            }
+
+            refreshIfNeeded(context, resolved)
+        } catch (e: Exception) {
+            Timber.e(e, "Error getting Epic credentials for account $accountId: ${e.message}")
+            Result.failure(Exception("Error getting credentials for account $accountId: ${e.message}", e))
+        }
+    }
+
+    private suspend fun refreshIfNeeded(context: Context, credentials: EpicCredentials): Result<EpicCredentials> {
+        val now = System.currentTimeMillis()
+        val bufferMs = 5 * 60 * 1000 // 5 minutes
+
+        if (now + bufferMs >= credentials.expiresAt) {
+            Timber.d("Access token expired, refreshing...")
+
+            val refreshResult = EpicAuthClient.refreshAccessToken(credentials.refreshToken)
+
+            if (refreshResult.isFailure) {
+                Timber.e("Failed to refresh token")
+                return Result.failure(Exception("Failed to refresh expired token: ${refreshResult.exceptionOrNull()?.message}"))
+            }
+
+            val authResponse = refreshResult.getOrNull()!!
+            val refreshedCredentials = EpicCredentials(
+                accessToken = authResponse.accessToken,
+                refreshToken = authResponse.refreshToken,
+                accountId = authResponse.accountId,
+                displayName = authResponse.displayName,
+                expiresAt = authResponse.expiresAt
+            )
+
+            saveCredentials(context, refreshedCredentials)
+            Timber.i("Access token refreshed successfully")
+
+            return Result.success(refreshedCredentials)
+        }
+
+        return Result.success(credentials)
     }
 
     /**
@@ -292,15 +326,27 @@ object EpicAuthManager {
             put("expires_at", credentials.expiresAt)
         }
 
+        val content = json.toString()
+
         val file = File(getCredentialsFilePath(context))
-        file.writeText(json.toString())
+        file.writeText(content)
+
+        // Also update the per-account store so that switching accounts doesn't
+        // restore stale (invalidated) refresh tokens.
+        val accountFile = File(context.filesDir, "epic/accounts/${credentials.accountId}/credentials.json")
+        if (accountFile.parentFile?.exists() == true) {
+            accountFile.writeText(content)
+        }
 
         Timber.d("Credentials saved to ${file.absolutePath}")
     }
 
     private fun loadCredentials(context: Context): EpicCredentials? {
+        return loadCredentialsFromFile(File(getCredentialsFilePath(context)))
+    }
+
+    private fun loadCredentialsFromFile(file: File): EpicCredentials? {
         return try {
-            val file = File(getCredentialsFilePath(context))
             if (!file.exists()) {
                 return null
             }
@@ -315,7 +361,7 @@ object EpicAuthManager {
                 expiresAt = json.getLong("expires_at")
             )
         } catch (e: Exception) {
-            Timber.e(e, "Failed to load credentials")
+            Timber.e(e, "Failed to load credentials from ${file.absolutePath}")
             null
         }
     }
