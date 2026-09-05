@@ -1,10 +1,8 @@
 <p align="center">
-  <img src="app/src/main/res/mipmap-xxxhdpi/ic_launcher.webp" width="128" height="128" alt="HyperNative Logo">
+  <img src="./screenshots/banner.jpeg" width="50%" alt="HyperNative banner">
 </p>
 
 <div align="center">
-
-# HyperNative
 
 **A privacy-focused, lightweight, and streamlined fork of GameNative.**
 
