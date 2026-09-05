@@ -28,7 +28,7 @@
 * 🖥️ **Smart Display Scaling**: Automatic screen-size detection with adaptive full-screen support for edge-to-edge gaming.
 * 🎨 **Refined Interface**: Distraction-free, modern UI built for fast touch navigation and quick access to your local library.
 * 🛡️ **Zero Telemetry & Tracking**: Stripped of all third-party analytics (PostHog, crash logs, diagnostic trackers). Your gameplay, account keys, and metrics remain strictly on-device.
-* 🧹 **Clean File System**: Resolved the critical upstream bug that generated thousands of ghost/empty directories on internal storage, preventing storage clutter and media scanner slowdowns.
+* 🧹 **Clean File System**: Resolved the critical upstream bug that generated thousands of ghost/empty directories on ./Downloads internal storage, preventing storage clutter and media scanner slowdowns.
 * ⚡ **Optimized Builds**: Cleaned-up dependencies, reduced overhead, and fixed compiler warnings for leaner runtime execution.
 
 ---
@@ -38,8 +38,8 @@
 HyperNative uses automated AI-assisted development pipelines to accelerate maintenance, clean legacy code, and triage issues:
 
 * **Compiler Cleanliness**: Elimination of legacy Gradle/NDK build warnings and dead code paths.
-* **Storage Sanitation**: Fixed improper directory creation routines that previously flooded the user's file system with empty folders.
-* **Assisted Tooling**: Refactoring and feature implementation refined using modern LLM pipelines (Gemini Flash 3.7 Extended and MiniMax/Mimo).
+* **Storage Sanitation**: Fixed improper directory creation routines that previously flooded the ./Downloads user's file system with empty folders.
+* **Assisted Tooling**: Refactoring and feature implementation refined using modern LLM pipelines (Gemini Flash 3.7 Extended and Mimo v2.5 pro).
 
 ---
 
@@ -56,7 +56,6 @@ HyperNative uses automated AI-assisted development pipelines to accelerate maint
 ## 📥 Installation
 
 Download the latest stable APK directly from GitHub Releases:
-
 👉 **[Download Latest APK](https://github.com/Compute64bits/HyperNative/releases/latest)**
 
 ---

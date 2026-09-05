@@ -16,6 +16,7 @@ import app.gamenative.service.epic.EpicAuthManager
 import app.gamenative.service.gog.GOGAuthManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -273,6 +274,7 @@ class AccountManager @Inject constructor(
      * Reactive version of [getAccountsThatOwnGame].
      * Emits a new filtered list whenever the underlying platform accounts change.
      */
+    @OptIn(ExperimentalCoroutinesApi::class)
     fun getAccountsThatOwnGameFlow(platform: String, appId: String): Flow<List<PlatformAccount>> {
         return platformAccountDao.getByPlatformFlow(platform).flatMapLatest { allPlatformAccounts ->
             flow {
