@@ -42,7 +42,7 @@ public abstract class WineUtils {
             Log.d("WineUtils", "Container missing D: or E: drives, adding them...");
             String missingDrives = "";
             if (!currentDrives.contains("D:")) {
-                missingDrives += "D:" + android.os.Environment.getExternalStoragePublicDirectory(android.os.Environment.DIRECTORY_DOWNLOADS);
+                missingDrives += "D:" + android.os.Environment.getExternalStoragePublicDirectory(android.os.Environment.DIRECTORY_DOWNLOADS) + "/HyperNative";
             }
             if (!currentDrives.contains("E:")) {
                 missingDrives += "E:/data/data/app.gamenative/storage";
@@ -53,11 +53,22 @@ public abstract class WineUtils {
             Log.d("WineUtils", "Updated container drives to: " + updatedDrives);
         }
 
+        // Migrate D: drive from old Downloads/ root to Downloads/HyperNative/
+        String downloadsPath = android.os.Environment.getExternalStoragePublicDirectory(android.os.Environment.DIRECTORY_DOWNLOADS).getAbsolutePath();
+        String hyperNativePath = downloadsPath + "/HyperNative";
+        String drivesStr = container.getDrives();
+        if (drivesStr.contains("D:" + downloadsPath) && !drivesStr.contains("D:" + hyperNativePath)) {
+            String migrated = drivesStr.replace("D:" + downloadsPath, "D:" + hyperNativePath);
+            container.setDrives(migrated);
+            container.saveData();
+            Log.d("WineUtils", "Migrated D: drive from Downloads/ to Downloads/HyperNative/");
+        }
+
         String gameDirectoryPath = null;
         for (String[] drive : container.drivesIterator()) {
             File linkTarget = new File(drive[1]);
             String path = linkTarget.getAbsolutePath();
-            if (!linkTarget.isDirectory() && path.endsWith("/app.gamenative/storage")) {
+            if (!linkTarget.isDirectory() && (path.endsWith("/app.gamenative/storage") || path.endsWith("/HyperNative"))) {
                 linkTarget.mkdirs();
                 FileUtils.chmod(linkTarget, 0771);
             }

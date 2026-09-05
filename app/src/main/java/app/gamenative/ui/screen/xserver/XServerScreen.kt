@@ -124,6 +124,7 @@ import app.gamenative.ui.data.XServerState
 import app.gamenative.ui.widget.PerformanceHudView
 import app.gamenative.utils.AssetUtils
 import app.gamenative.utils.ContainerUtils
+import app.gamenative.utils.DownloadsTempCleaner
 import app.gamenative.utils.downloader.CoreDriverDownloader
 import app.gamenative.utils.CustomGameScanner
 import app.gamenative.utils.ExecutableSelectionUtils
@@ -393,6 +394,9 @@ fun XServerScreen(
 
     val container = remember(appId) {
         ContainerUtils.getContainer(context, appId)
+    }
+    val downloadsSnapshot = remember(appId) {
+        DownloadsTempCleaner.snapshot()
     }
     val activity = remember(context) { BrightnessManager.findActivity(context) }
 
@@ -929,6 +933,7 @@ fun XServerScreen(
                                     currentAppInfo,
                                     container,
                                     appId,
+                                    downloadsSnapshot,
                                     onExit,
                                     navigateBack,
                                 )
@@ -1340,7 +1345,7 @@ fun XServerScreen(
                     PluviaApp.xEnvironment?.resumeGameProcesses()
                 }
                 clearOverlayPauseState()
-                exit(xServerView!!.getxServer().winHandler, frameRating, currentAppInfo, container, appId, onExit, navigateBack)
+                exit(xServerView!!.getxServer().winHandler, frameRating, currentAppInfo, container, appId, downloadsSnapshot, onExit, navigateBack)
                 true
             }
 
@@ -1477,7 +1482,7 @@ fun XServerScreen(
     // Event handlers defined in composable scope to capture latest state on each recomposition
     val onActivityDestroyed: (AndroidEvent.ActivityDestroyed) -> Unit = {
         Timber.i("onActivityDestroyed")
-        exit(xServerView!!.getxServer().winHandler, frameRating, currentAppInfo, container, appId, onExit, navigateBack)
+        exit(xServerView!!.getxServer().winHandler, frameRating, currentAppInfo, container, appId, downloadsSnapshot, onExit, navigateBack)
     }
     val onKeyEvent: (AndroidEvent.KeyEvent) -> Boolean = {
         val isKeyboard = Keyboard.isKeyboardDevice(it.event.device)
@@ -1620,11 +1625,11 @@ fun XServerScreen(
     }
     val onGuestProgramTerminated: (AndroidEvent.GuestProgramTerminated) -> Unit = {
         Timber.i("onGuestProgramTerminated")
-        exit(xServerView!!.getxServer().winHandler, frameRating, currentAppInfo, container, appId, onExit, navigateBack)
+        exit(xServerView!!.getxServer().winHandler, frameRating, currentAppInfo, container, appId, downloadsSnapshot, onExit, navigateBack)
     }
     val onForceCloseApp: (SteamEvent.ForceCloseApp) -> Unit = {
         Timber.i("onForceCloseApp")
-        exit(xServerView!!.getxServer().winHandler, frameRating, currentAppInfo, container, appId, onExit, navigateBack)
+        exit(xServerView!!.getxServer().winHandler, frameRating, currentAppInfo, container, appId, downloadsSnapshot, onExit, navigateBack)
     }
     val onPlayingBlocked: (SteamEvent.PlayingBlocked) -> Unit = { event ->
         if (isOffline || container.isSteamOfflineMode()) {
@@ -2847,7 +2852,7 @@ fun XServerScreen(
                 TextButton(onClick = {
                     showPlayingBlockedDialog = false
                     playingBlockedRemoteName = null
-                    exit(xServerView?.getxServer()?.winHandler, frameRating, currentAppInfo, container, appId, onExit, navigateBack)
+                    exit(xServerView?.getxServer()?.winHandler, frameRating, currentAppInfo, container, appId, downloadsSnapshot, onExit, navigateBack)
                 }) {
                     Text(text = stringResource(R.string.cancel))
                 }
@@ -4552,6 +4557,7 @@ private fun exit(
     appInfo: SteamApp?,
     container: Container,
     appId: String,
+    downloadsSnapshot: Set<String>,
     onExit: (onComplete: (() -> Unit)?) -> Unit,
     navigateBack: () -> Unit,
 ) {
@@ -4612,6 +4618,15 @@ private fun exit(
             }
         } catch (e: Exception) {
             Timber.e(e, "Error emptying Wine/XDG trash")
+        }
+    }
+
+    // Clean up temp directories created in Downloads during this game session
+    CoroutineScope(Dispatchers.IO).launch {
+        try {
+            DownloadsTempCleaner.cleanUpSince(downloadsSnapshot)
+        } catch (e: Exception) {
+            Timber.e(e, "Error cleaning up Downloads temp directories")
         }
     }
     frameRating?.writeSessionSummary()

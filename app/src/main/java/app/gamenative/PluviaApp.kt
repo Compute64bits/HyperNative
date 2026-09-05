@@ -93,28 +93,30 @@ class PluviaApp : SplitCompatApplication() {
                 appScope.launch {
                     try {
                         val steamId64 = PrefManager.steamUserSteamId64
-                        val accountId = if (steamId64 != 0L) steamId64.toString() else PrefManager.username
-                        if (accountId.isNotEmpty()) {
-                            accountManager.saveCurrentSteamCredentials(applicationContext, accountId)
-                            val json = org.json.JSONObject().apply {
-                                put("username", PrefManager.username)
-                                put("access_token", PrefManager.accessToken)
-                                put("refresh_token", PrefManager.refreshToken)
-                                put("steam_user_name", PrefManager.steamUserName)
-                                put("steam_user_avatar_hash", PrefManager.steamUserAvatarHash)
-                                put("steam_user_account_id", PrefManager.steamUserAccountId)
-                                put("steam_user_steam_id_64", steamId64)
-                                put("client_id", PrefManager.clientId ?: 0L)
-                            }
-                            accountManager.addAccount(
-                                context = applicationContext,
-                                platform = "STEAM",
-                                accountId = accountId,
-                                displayName = PrefManager.steamUserName.ifEmpty { PrefManager.username },
-                                avatarUrl = PrefManager.steamUserAvatarHash,
-                                credentialsJson = json,
-                            )
+                        if (steamId64 == 0L) {
+                            Timber.w("[PluviaApp] steamId64 is 0 after login, skipping account registration")
+                            return@launch
                         }
+                        val accountId = steamId64.toString()
+                        accountManager.saveCurrentSteamCredentials(applicationContext, accountId)
+                        val json = org.json.JSONObject().apply {
+                            put("username", PrefManager.username)
+                            put("access_token", PrefManager.accessToken)
+                            put("refresh_token", PrefManager.refreshToken)
+                            put("steam_user_name", PrefManager.steamUserName)
+                            put("steam_user_avatar_hash", PrefManager.steamUserAvatarHash)
+                            put("steam_user_account_id", PrefManager.steamUserAccountId)
+                            put("steam_user_steam_id_64", steamId64)
+                            put("client_id", PrefManager.clientId ?: 0L)
+                        }
+                        accountManager.addAccount(
+                            context = applicationContext,
+                            platform = "STEAM",
+                            accountId = accountId,
+                            displayName = PrefManager.steamUserName.ifEmpty { PrefManager.username },
+                            avatarUrl = PrefManager.steamUserAvatarHash,
+                            credentialsJson = json,
+                        )
                     } catch (e: Exception) {
                         Timber.e(e, "[PluviaApp] Failed to register Steam account")
                     }
@@ -135,6 +137,15 @@ class PluviaApp : SplitCompatApplication() {
                 onProgressUpdate = null,
                 onComplete = null
             )
+        }
+
+        // Clean up temp directories left by Wine apps in Downloads on previous sessions
+        appScope.launch {
+            try {
+                app.gamenative.utils.DownloadsTempCleaner.cleanUp()
+            } catch (e: Exception) {
+                Timber.e(e, "Failed to clean up Downloads temp directories")
+            }
         }
 
         // Preload all container files in the background

@@ -684,6 +684,9 @@
     <string name="exec_arguments_example">Exemple : -dx11</string>
     <string name="language">Langue</string>
     <string name="screen_size">Taille de l\'écran</string>
+    <string name="screen_size_custom">Personnalisé</string>
+    <string name="screen_size_category_phone">Écran du téléphone</string>
+    <string name="screen_size_category_standard">Tailles standard</string>
     <string name="width">Largeur</string>
     <string name="height">Hauteur</string>
     <string name="audio_driver">Pilote audio</string>

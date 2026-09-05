@@ -110,6 +110,23 @@ object PrefManager {
         }
     }
 
+    fun clearSteamCredentialsButKeepUsername() {
+        scope.launch {
+            dataStore.edit { pref ->
+                pref.remove(ACCESS_TOKEN_ENC)
+                pref.remove(REFRESH_TOKEN_ENC)
+                pref.remove(CLIENT_ID)
+                pref.remove(PERSONA_STATE)
+                pref.remove(STEAM_USER_ACCOUNT_ID)
+                pref.remove(STEAM_USER_STEAM_ID_64)
+                pref.remove(STEAM_USER_AVATAR_HASH)
+                pref.remove(STEAM_USER_NAME)
+                pref.remove(LAST_PICS_CHANGE_NUMBER)
+                pref.remove(STEAM_GAMES_COUNT)
+            }
+        }
+    }
+
     fun getBoolean(key: String, defaultValue: Boolean): Boolean =
         getPref(booleanPreferencesKey(key), defaultValue)
 
@@ -130,6 +147,12 @@ object PrefManager {
     @Suppress("SameParameterValue")
     private fun <T> setPref(key: Preferences.Key<T>, value: T) {
         scope.launch {
+            dataStore.edit { pref -> pref[key] = value }
+        }
+    }
+
+    private fun <T> setPrefSync(key: Preferences.Key<T>, value: T) {
+        runBlocking {
             dataStore.edit { pref -> pref[key] = value }
         }
     }
@@ -933,12 +956,20 @@ object PrefManager {
             setPref(STEAM_USER_ACCOUNT_ID, value)
         }
 
+    fun setSteamUserAccountIdSync(value: Int) {
+        setPrefSync(STEAM_USER_ACCOUNT_ID, value)
+    }
+
     private val STEAM_USER_STEAM_ID_64 = longPreferencesKey("steam_user_steam_id_64")
     var steamUserSteamId64: Long
         get() = getPref(STEAM_USER_STEAM_ID_64, 0L)
         set(value) {
             setPref(STEAM_USER_STEAM_ID_64, value)
         }
+
+    fun setSteamUserSteamId64Sync(value: Long) {
+        setPrefSync(STEAM_USER_STEAM_ID_64, value)
+    }
 
     /**
      * Get or Set the last known avatar hash for the user.

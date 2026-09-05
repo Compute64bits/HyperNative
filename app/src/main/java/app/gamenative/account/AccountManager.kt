@@ -90,22 +90,17 @@ class AccountManager @Inject constructor(
         File(accountsDir, "credentials.json").writeText(credentialsJson.toString())
 
         val isFirst = platformAccountDao.countForPlatform(platform) == 0
-        val account = if (existing != null) {
-            existing.copy(
-                displayName = displayName,
-                avatarUrl = avatarUrl,
-                credentialsPath = accountsDir.absolutePath,
-            ).also { platformAccountDao.update(it) }
-        } else {
-            PlatformAccount(
-                platform = platform,
-                accountId = accountId,
-                displayName = displayName,
-                avatarUrl = avatarUrl,
-                isPrimary = isFirst,
-                credentialsPath = accountsDir.absolutePath,
-            ).also { platformAccountDao.insert(it) }
-        }
+        val account = PlatformAccount(
+            id = existing?.id ?: 0,
+            platform = platform,
+            accountId = accountId,
+            displayName = displayName,
+            avatarUrl = avatarUrl,
+            isPrimary = existing?.isPrimary ?: isFirst,
+            credentialsPath = accountsDir.absolutePath,
+            addedAt = existing?.addedAt ?: System.currentTimeMillis(),
+        )
+        platformAccountDao.upsert(account)
 
         // If primary (first account or already primary), sync to active location
         if (account.isPrimary) {
@@ -251,7 +246,10 @@ class AccountManager @Inject constructor(
         val ownerAccountIds: List<String>? = when (platform) {
             "STEAM" -> {
                 val steamApp = steamAppDao.findApp(appId.toIntOrNull() ?: -1)
-                steamApp?.ownerAccountId?.map { it.toString() }?.ifEmpty { null }
+                steamApp?.ownerAccountId?.map {
+                    // Convert 32-bit account ID to 64-bit Steam ID
+                    (it.toLong() + STEAM_ID_64_BASE).toString()
+                }?.ifEmpty { null }
             }
             "EPIC" -> {
                 epicGameDao.getAccountIdsForGame(appId.toIntOrNull() ?: -1).ifEmpty { null }
@@ -286,7 +284,9 @@ class AccountManager @Inject constructor(
                 val ownerAccountIds: List<String>? = when (platform) {
                     "STEAM" -> {
                         val steamApp = steamAppDao.findApp(appId.toIntOrNull() ?: -1)
-                        steamApp?.ownerAccountId?.map { it.toString() }?.ifEmpty { null }
+                        steamApp?.ownerAccountId?.map {
+                            (it.toLong() + STEAM_ID_64_BASE).toString()
+                        }?.ifEmpty { null }
                     }
                     "EPIC" -> {
                         epicGameDao.getAccountIdsForGame(appId.toIntOrNull() ?: -1).ifEmpty { null }
@@ -442,7 +442,7 @@ class AccountManager @Inject constructor(
             accountsDir.mkdirs()
             File(accountsDir, "credentials.json").writeText(json.toString())
 
-            platformAccountDao.insert(
+            platformAccountDao.upsert(
                 PlatformAccount(
                     platform = "GOG",
                     accountId = userId,
@@ -472,7 +472,7 @@ class AccountManager @Inject constructor(
             accountsDir.mkdirs()
             File(accountsDir, "credentials.json").writeText(json.toString())
 
-            platformAccountDao.insert(
+            platformAccountDao.upsert(
                 PlatformAccount(
                     platform = "EPIC",
                     accountId = accountId,
@@ -501,7 +501,7 @@ class AccountManager @Inject constructor(
             accountsDir.mkdirs()
             File(accountsDir, "credentials.json").writeText(json.toString())
 
-            platformAccountDao.insert(
+            platformAccountDao.upsert(
                 PlatformAccount(
                     platform = "AMAZON",
                     accountId = deviceSerial,
@@ -517,15 +517,55 @@ class AccountManager @Inject constructor(
     }
 
     private suspend fun migrateSteamCredentials(context: Context) {
-        if (platformAccountDao.countForPlatform("STEAM") > 0) return
         val username = PrefManager.username
         val refreshToken = PrefManager.refreshToken
         if (username.isEmpty() || refreshToken.isEmpty()) return
 
-        try {
-            val steamId64 = PrefManager.steamUserSteamId64
-            val accountId = if (steamId64 != 0L) steamId64.toString() else username
+        val steamId64 = PrefManager.steamUserSteamId64
+        if (steamId64 == 0L) {
+            Timber.w("[AccountManager] steamId64 is 0, deferring Steam migration until login provides it")
+            return
+        }
+        val accountId = steamId64.toString()
 
+        // Check if an account already exists with the correct steamId64 identifier
+        if (platformAccountDao.getByAccountId("STEAM", accountId) != null) return
+
+        // Check if an old account exists with the username as identifier (from previous bug)
+        val oldAccount = platformAccountDao.getByAccountId("STEAM", username)
+        if (oldAccount != null) {
+            // Migrate: update the old account's identifier to use steamId64
+            platformAccountDao.deleteByAccountId("STEAM", username)
+            val accountsDir = getAccountsDir(context, "STEAM", accountId)
+            accountsDir.mkdirs()
+            val json = JSONObject().apply {
+                put("username", username)
+                put("access_token", PrefManager.accessToken)
+                put("refresh_token", refreshToken)
+                put("steam_user_name", PrefManager.steamUserName)
+                put("steam_user_avatar_hash", PrefManager.steamUserAvatarHash)
+                put("steam_user_account_id", PrefManager.steamUserAccountId)
+                put("steam_user_steam_id_64", steamId64)
+                put("client_id", PrefManager.clientId ?: 0L)
+            }
+            File(accountsDir, "credentials.json").writeText(json.toString())
+
+            platformAccountDao.upsert(
+                PlatformAccount(
+                    platform = "STEAM",
+                    accountId = accountId,
+                    displayName = PrefManager.steamUserName.ifEmpty { username },
+                    avatarUrl = PrefManager.steamUserAvatarHash,
+                    isPrimary = oldAccount.isPrimary,
+                    credentialsPath = accountsDir.absolutePath,
+                )
+            )
+            Timber.i("[AccountManager] Migrated Steam account from username ($username) to steamId64 ($accountId)")
+            return
+        }
+
+        // No existing account — create one
+        try {
             val accountsDir = getAccountsDir(context, "STEAM", accountId)
             accountsDir.mkdirs()
 
@@ -541,7 +581,7 @@ class AccountManager @Inject constructor(
             }
             File(accountsDir, "credentials.json").writeText(json.toString())
 
-            platformAccountDao.insert(
+            platformAccountDao.upsert(
                 PlatformAccount(
                     platform = "STEAM",
                     accountId = accountId,
@@ -551,13 +591,16 @@ class AccountManager @Inject constructor(
                     credentialsPath = accountsDir.absolutePath,
                 )
             )
-            Timber.i("[AccountManager] Migrated existing Steam credentials for user $username")
+            Timber.i("[AccountManager] Migrated existing Steam credentials for user $username (steamId64=$accountId)")
         } catch (e: Exception) {
             Timber.e(e, "[AccountManager] Failed to migrate Steam credentials")
         }
     }
 
     companion object {
+        /** Offset to convert a32-bit Steam account ID to a64-bit Steam ID. */
+        private const val STEAM_ID_64_BASE = 76561197960265728L
+
         /** Convert a GameSource enum to the platform string used by AccountManager. */
         fun platformFromGameSource(gameSource: GameSource): String = when (gameSource) {
             GameSource.STEAM -> "STEAM"

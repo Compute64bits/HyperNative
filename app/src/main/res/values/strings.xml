@@ -809,6 +809,9 @@
     <string name="exec_arguments_example">Example: -dx11</string>
     <string name="language">Language</string>
     <string name="screen_size">Screen Size</string>
+    <string name="screen_size_custom">Custom</string>
+    <string name="screen_size_category_phone">Phone Screen</string>
+    <string name="screen_size_category_standard">Standard Sizes</string>
     <string name="width">Width</string>
     <string name="height">Height</string>
     <string name="audio_driver">Audio Driver</string>

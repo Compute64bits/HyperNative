@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import app.gamenative.R
 import app.gamenative.ui.component.NoExtractOutlinedTextField
+import app.gamenative.ui.component.settings.ScreenSizeDropdown
 import app.gamenative.ui.component.settings.SettingsListDropdown
 import com.alorma.compose.settings.ui.SettingsSwitch
 import app.gamenative.ui.theme.settingsTileColors
@@ -293,7 +294,7 @@ fun GeneralTabContent(
             title = { Text(text = stringResource(R.string.language)) },
             colors = settingsTileColors(),
         )
-        SettingsListDropdown(
+        ScreenSizeDropdown(
             colors = settingsTileColors(),
             title = { Text(text = stringResource(R.string.screen_size)) },
             value = state.screenSizeIndex.value,

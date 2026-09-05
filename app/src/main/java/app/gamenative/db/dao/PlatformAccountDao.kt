@@ -4,7 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import androidx.room.Update
+import androidx.room.Upsert
 import app.gamenative.data.GameAccountPreference
 import app.gamenative.data.PlatformAccount
 import kotlinx.coroutines.flow.Flow
@@ -30,11 +30,8 @@ interface PlatformAccountDao {
     @Query("SELECT * FROM platform_accounts WHERE platform = :platform AND account_id = :accountId LIMIT 1")
     suspend fun getByAccountId(platform: String, accountId: String): PlatformAccount?
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(account: PlatformAccount): Long
-
-    @Update
-    suspend fun update(account: PlatformAccount)
+    @Upsert
+    suspend fun upsert(account: PlatformAccount)
 
     @Query("DELETE FROM platform_accounts WHERE id = :id")
     suspend fun deleteById(id: Int)

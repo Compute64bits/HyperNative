@@ -3835,12 +3835,12 @@ class SteamService : Service(), IChallengeUrlChanged {
 
         if (userSteamId?.isValid == true) {
             if (PrefManager.steamUserAccountId != userSteamId!!.accountID.toInt()) {
-                PrefManager.steamUserAccountId = userSteamId!!.accountID.toInt()
+                PrefManager.setSteamUserAccountIdSync(userSteamId!!.accountID.toInt())
                 Timber.d("Saving logged in Steam accountID ${userSteamId!!.accountID.toInt()}")
             }
             val steamId64 = userSteamId!!.convertToUInt64()
             if (PrefManager.steamUserSteamId64 != steamId64) {
-                PrefManager.steamUserSteamId64 = steamId64
+                PrefManager.setSteamUserSteamId64Sync(steamId64)
                 Timber.d("Saving logged in Steam ID64 $steamId64")
             }
         }
@@ -3919,7 +3919,17 @@ class SteamService : Service(), IChallengeUrlChanged {
 
             else -> {
                 if (shouldClearUserDataForLoggedOnFailure(callback.result)) {
-                    PrefManager.clearSteamSessionPreferences()
+                    when (callback.result) {
+                        EResult.Expired,
+                        EResult.CachedCredentialInvalid,
+                        EResult.Revoked,
+                        EResult.AccessDenied -> {
+                            PrefManager.clearSteamCredentialsButKeepUsername()
+                        }
+                        else -> {
+                            PrefManager.clearSteamSessionPreferences()
+                        }
+                    }
                 }
 
                 _loginResult = LoginResult.Failed

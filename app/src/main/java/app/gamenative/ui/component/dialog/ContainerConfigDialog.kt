@@ -88,6 +88,9 @@ import app.gamenative.ui.component.dialog.state.MessageDialogState
 import app.gamenative.ui.component.settings.SettingsCPUList
 import app.gamenative.ui.component.settings.SettingsCenteredLabel
 import app.gamenative.ui.component.settings.SettingsListDropdown
+import app.gamenative.ui.component.settings.ScreenSizeDropdown
+import app.gamenative.ui.component.settings.ScreenSizeItem
+import app.gamenative.ui.component.settings.buildScreenSizeCategories
 import app.gamenative.ui.components.rememberCustomGameFolderPicker
 import app.gamenative.ui.components.requestPermissionsForPath
 import app.gamenative.ui.theme.PluviaTheme
@@ -154,7 +157,7 @@ internal fun winComponentsItemTitleRes(string: String): Int {
 }
 
 private data class ContainerConfigDialogStaticData(
-    val screenSizes: List<String>,
+    val screenSizes: List<ScreenSizeItem>,
     val baseGraphicsDrivers: List<String>,
     val dxWrappers: List<String>,
     val displayRenderers: List<String>,
@@ -214,7 +217,7 @@ private fun rememberContainerConfigDialogStaticData(): ContainerConfigDialogStat
         }
 
     return ContainerConfigDialogStaticData(
-        screenSizes = stringArrayResource(R.array.screen_size_entries).toList(),
+        screenSizes = buildScreenSizeCategories(context),
         baseGraphicsDrivers = stringArrayResource(R.array.graphics_driver_entries).toList(),
         dxWrappers = stringArrayResource(R.array.dxwrapper_entries).toList(),
         displayRenderers = stringArrayResource(R.array.displayrenderers_entries).toList(),
@@ -756,19 +759,22 @@ fun ContainerConfigDialog(
         }
 
         val screenSizeIndexRef = rememberSaveable {
-            val searchIndex = screenSizes.indexOfFirst { it.contains(config.screenSize) }
+            val selectableItems = screenSizes.filter { !it.isHeader }
+            val searchIndex = selectableItems.indexOfFirst { it.label.contains(config.screenSize) }
             mutableIntStateOf(if (searchIndex > 0) searchIndex else 0)
         }
         var screenSizeIndex by screenSizeIndexRef
         val customScreenWidthRef = rememberSaveable {
-            val searchIndex = screenSizes.indexOfFirst { it.contains(config.screenSize) }
+            val selectableItems = screenSizes.filter { !it.isHeader }
+            val searchIndex = selectableItems.indexOfFirst { it.label.contains(config.screenSize) }
             mutableStateOf(
                 if (searchIndex <= 0) config.screenSize.split("x").getOrElse(0) { "1280" } else "1280"
             )
         }
         var customScreenWidth by customScreenWidthRef
         val customScreenHeightRef = rememberSaveable {
-            val searchIndex = screenSizes.indexOfFirst { it.contains(config.screenSize) }
+            val selectableItems = screenSizes.filter { !it.isHeader }
+            val searchIndex = selectableItems.indexOfFirst { it.label.contains(config.screenSize) }
             mutableStateOf(
                 if (searchIndex <= 0) config.screenSize.split("x").getOrElse(1) { "720" } else "720"
             )
@@ -1029,6 +1035,7 @@ fun ContainerConfigDialog(
         )
 
         val applyScreenSizeToConfig: () -> Unit = {
+            val selectableItems = screenSizes.filter { !it.isHeader }
             val screenSize = if (screenSizeIndex == 0) {
                 if (customScreenWidth.isNotEmpty() && customScreenHeight.isNotEmpty()) {
                     "${customScreenWidth}x$customScreenHeight"
@@ -1036,7 +1043,12 @@ fun ContainerConfigDialog(
                     config.screenSize
                 }
             } else {
-                screenSizes[screenSizeIndex].split(" ")[0]
+                val label = selectableItems[screenSizeIndex].label
+                if (label.contains(" /")) {
+                    label.substringBefore(" /").trim()
+                } else {
+                    label.split(" ")[0]
+                }
             }
             config = config.copy(screenSize = screenSize)
         }
